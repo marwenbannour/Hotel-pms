@@ -71,7 +71,11 @@ export interface Dashboard {
   date: string;
   generatedAt: string;
   sections: ('rooms' | 'movements' | 'alerts' | 'kpis')[];
-  rooms?: Record<RoomStatus, number> & { total: number; departingToday: string[] };
+  rooms?: Record<RoomStatus, number> & {
+    total: number;
+    departingToday: string[];
+    byType?: (Record<RoomStatus, number> & { code: string; name: string; arrivalsPending: number })[];
+  };
   movements?: {
     arrivals: Movement[];
     departures: Movement[];

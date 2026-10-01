@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/lang-context';
 import type { Room, RoomStatus, RoomType } from '@/lib/types';
 
 /** Mêmes transitions manuelles que l'API (occupée ne se libère que par le départ). */
-const TRANSITIONS: Record<RoomStatus, RoomStatus[]> = {
+export const TRANSITIONS: Record<RoomStatus, RoomStatus[]> = {
   available: ['cleaning', 'maintenance'],
   cleaning: ['available', 'maintenance'],
   maintenance: ['available', 'cleaning'],

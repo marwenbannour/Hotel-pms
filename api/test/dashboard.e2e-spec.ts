@@ -47,6 +47,8 @@ describe('Tableau de bord', () => {
     expect(res.body.movements).toBeUndefined();
     expect(res.body.kpis).toBeUndefined();
     expect(res.body.rooms).toMatchObject({ total: 9, occupied: 1, available: 8, departingToday: [] });
+    // Une arrivée DBL reste à loger : comptée sans aucune donnée client.
+    expect(res.body.rooms.byType.find((t: { code: string }) => t.code === 'DBL')).toMatchObject({ arrivalsPending: 1 });
   });
 
   it('la réception voit les mouvements et l’occupation, sans montants', async () => {
