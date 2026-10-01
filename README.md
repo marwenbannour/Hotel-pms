@@ -10,9 +10,13 @@ Mise en œuvre de l’option A du cahier des charges v1.1.
 ## Démarrage rapide avec Docker
 
 ```bash
-JWT_SECRET=$(openssl rand -hex 32) docker compose up --build -d
+cp .env.example .env
+sed -i "s/^JWT_SECRET=.*/JWT_SECRET=$(openssl rand -hex 32)/" .env
+docker compose up --build -d
 docker compose exec api node dist/database/seed.js --demo-day
 ```
+
+Le fichier `.env` (non versionné) est lu par toutes les commandes `docker compose`. Commandes utiles : `docker compose ps`, `docker compose logs -f api`, `docker compose down` (ajouter `-v` pour effacer la base).
 
 Ouvrez http://localhost:3001 et connectez-vous avec `reception@hotel.local`, `menage@hotel.local` ou `admin@hotel.local` (mot de passe `ChangeMe!2026`). Le compte direction vous guidera pour activer la double authentification.
 
