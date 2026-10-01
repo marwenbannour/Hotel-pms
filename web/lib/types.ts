@@ -33,6 +33,38 @@ export interface RoomType {
   id: string;
   code: string;
   name: string;
+  capacity?: number;
+  basePrice?: number;
+  currency?: string;
+  version?: number;
+}
+
+export interface NavigationItem {
+  id: string;
+  key: string;
+  parentKey: string | null;
+  path: string | null;
+  icon: string | null;
+  permission: string | null;
+  module: string;
+  labelFr: string;
+  labelEn: string;
+  labelAr: string;
+  sortOrder: number;
+  enabled: boolean;
+  version: number;
+}
+
+export interface AppUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  locale: 'fr' | 'en' | 'ar';
+  active: boolean;
+  mfaEnabled: boolean;
+  mfaRequired: boolean;
+  createdAt: string;
 }
 
 export interface Movement {

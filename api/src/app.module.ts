@@ -19,6 +19,7 @@ import { MeModule } from './modules/me/me.module';
 import { NavigationModule } from './modules/navigation/navigation.module';
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     MeModule,
     NavigationModule,
     RoomsModule,
+    UsersModule,
     GuestsModule,
     ReservationsModule,
     DashboardModule,

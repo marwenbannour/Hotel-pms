@@ -716,6 +716,187 @@
         ]
       }
     },
+    "/v1/users": {
+      "get": {
+        "operationId": "UsersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Comptes utilisateurs",
+        "tags": [
+          "Administration"
+        ]
+      },
+      "post": {
+        "operationId": "UsersController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer un compte avec un mot de passe initial",
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
+    "/v1/users/{id}": {
+      "get": {
+        "operationId": "UsersController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration"
+        ]
+      },
+      "patch": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Nom, rôle, langue, activation (ferme les sessions si le rôle change ou si le compte est désactivé)",
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
+    "/v1/users/{id}/password": {
+      "post": {
+        "operationId": "UsersController_resetPassword",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Définir un nouveau mot de passe (ferme les sessions)",
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
+    "/v1/users/{id}/mfa/reset": {
+      "post": {
+        "operationId": "UsersController_resetMfa",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Réinitialiser la double authentification (réenrôlement à la prochaine connexion)",
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
     "/v1/guests": {
       "get": {
         "operationId": "GuestsController_list",
@@ -2551,6 +2732,93 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "nadia@hotel.local"
+          },
+          "fullName": {
+            "type": "string",
+            "example": "Nadia Haddad"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "reception",
+              "housekeeping",
+              "restaurant",
+              "accounting",
+              "it"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en",
+              "ar"
+            ],
+            "default": "fr"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 12,
+            "description": "Mot de passe initial, à communiquer à la personne"
+          }
+        },
+        "required": [
+          "email",
+          "fullName",
+          "role",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "reception",
+              "housekeeping",
+              "restaurant",
+              "accounting",
+              "it"
+            ]
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en",
+              "ar"
+            ]
+          },
+          "active": {
+            "type": "boolean",
+            "description": "false : le compte ne peut plus se connecter et ses sessions sont fermées"
+          }
+        }
+      },
+      "ResetPasswordDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "minLength": 12
+          }
+        },
+        "required": [
+          "password"
         ]
       },
       "CreateGuestDto": {
