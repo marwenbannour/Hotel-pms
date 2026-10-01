@@ -12,3 +12,7 @@ obj/
 *.log
 .DS_Store
 Thumbs.db
+
+# Tests de bout en bout
+web/e2e/artifacts/
+__pycache__/

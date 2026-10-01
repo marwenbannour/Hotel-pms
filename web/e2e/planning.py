@@ -1,13 +1,7 @@
 """Planning des chambres : attribution au menu, glisser-déposer, refus d'un chevauchement, arabe."""
-import os, re
-from playwright.sync_api import sync_playwright, expect
-
-BASE = 'http://127.0.0.1:3001'
-
-def login(page, email):
-    page.goto(BASE + '/login')
-    page.fill('input[type=email]', email); page.fill('input[type=password]', 'ChangeMe!2026'); page.click('form button')
-    page.wait_for_url(BASE + '/')
+import re
+from playwright.sync_api import expect
+from common import BASE, launch, login, scenario, shot
 
 def stay(page, ref):
     data = page.request.get(BASE + '/api/v1/reservations?q=' + ref).json()['data'][0]
@@ -16,8 +10,8 @@ def stay(page, ref):
 def room_cell(page, number):
     return page.locator('div[role=row]').filter(has=page.locator('div[role=rowheader]', has_text=re.compile(rf'^{number}'))).locator('div[role=gridcell]')
 
-with sync_playwright() as p:
-    b = p.chromium.launch(executable_path=os.environ.get('CHROME_PATH') or None)
+with scenario() as p:
+    b = launch(p)
     ctx = b.new_context(viewport={'width': 1440, 'height': 1000})
     page = ctx.new_page()
     login(page, 'reception@hotel.local')
@@ -25,7 +19,7 @@ with sync_playwright() as p:
     page.goto(BASE + '/planning')
     page.wait_for_selector('div[role=grid] button[aria-label*="RDEMO"]')
     n_bars = page.locator('div[role=grid] button[aria-label*="RDEMO"]').count()
-    page.screenshot(path='/tmp/p_planning.png', full_page=True)
+    shot(page, 'p_planning', full_page=True)
     assert n_bars >= 14, n_bars
     expect(page.get_by_text('À attribuer').first).to_be_visible()
     print(f'1. planning affiché : {n_bars} séjours, ligne « À attribuer » présente')
@@ -34,7 +28,7 @@ with sync_playwright() as p:
     page.locator('button[aria-label*="RDEMO012"]').click()
     dialog = page.get_by_role('dialog')
     expect(dialog).to_be_visible()
-    page.screenshot(path='/tmp/p_popover.png', clip={'x': 0, 'y': 0, 'width': 1440, 'height': 1000})
+    shot(page, 'p_popover', clip={'x': 0, 'y': 0, 'width': 1440, 'height': 1000})
     dialog.get_by_label('Attribuer la chambre').select_option(label='103')
     expect(page.get_by_role('status')).to_contain_text('attribuée à la chambre 103')
     assert stay(page, 'RDEMO012')['room']['number'] == '103'
@@ -70,7 +64,7 @@ with sync_playwright() as p:
     page.goto(BASE + '/planning')
     page.wait_for_selector('div[role=grid] button[aria-label*="RDEMO"]'); page.wait_for_timeout(500)
     assert page.evaluate('document.documentElement.dir') == 'rtl'
-    page.screenshot(path='/tmp/p_planning_ar.png', full_page=True)
+    shot(page, 'p_planning_ar', full_page=True)
     print('7. planning en arabe (RTL)')
 
     # 8. Le ménage n'y a pas accès

@@ -23,3 +23,8 @@ Ouvrez http://localhost:3001 et connectez-vous avec `reception@hotel.local`, `me
 ## Développement
 
 Voir `api/README.md` puis `web/README.md`.
+
+## Tests
+
+- API : `npm run test:e2e` dans `api/` (base PostgreSQL de test).
+- Parcours complets dans le navigateur : `python web/e2e/run.py` (pile Docker isolée, voir `web/README.md`).
