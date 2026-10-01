@@ -1,0 +1,2923 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "HealthController_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Supervision"
+        ]
+      }
+    },
+    "/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Connexion ; renvoie les jetons ou un mfaToken si la MFA est active",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/auth/mfa/verify": {
+      "post": {
+        "operationId": "AuthController_verify",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaVerifyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Second facteur (code TOTP)",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Rotation du jeton de rafraîchissement",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "Révoque la session (toute la famille de jetons)",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "MeController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Profil et droits de l’utilisateur connecté",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/me/navigation": {
+      "get": {
+        "operationId": "MeController_navigation",
+        "parameters": [
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Menu dynamique : entrées autorisées, dans la langue demandée",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/me/mfa/setup": {
+      "post": {
+        "operationId": "MeController_setupMfa",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Génère le secret TOTP à scanner dans l’application d’authentification",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/me/mfa/enable": {
+      "post": {
+        "operationId": "MeController_enableMfa",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MfaCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Active la MFA après vérification d’un premier code",
+        "tags": [
+          "Session"
+        ]
+      }
+    },
+    "/v1/navigation-items": {
+      "get": {
+        "operationId": "NavigationController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Toutes les entrées du menu (paramétrage)",
+        "tags": [
+          "Administration"
+        ]
+      },
+      "post": {
+        "operationId": "NavigationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateNavigationItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
+    "/v1/navigation-items/{id}": {
+      "get": {
+        "operationId": "NavigationController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration"
+        ]
+      },
+      "patch": {
+        "operationId": "NavigationController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateNavigationItemDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifier une entrée (If-Match obligatoire)",
+        "tags": [
+          "Administration"
+        ]
+      },
+      "delete": {
+        "operationId": "NavigationController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration"
+        ]
+      }
+    },
+    "/v1/room-types": {
+      "get": {
+        "operationId": "RoomTypesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      },
+      "post": {
+        "operationId": "RoomTypesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      }
+    },
+    "/v1/room-types/{id}": {
+      "get": {
+        "operationId": "RoomTypesController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      },
+      "patch": {
+        "operationId": "RoomTypesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "if-match",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag obtenu à la lecture",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoomTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      }
+    },
+    "/v1/rooms": {
+      "get": {
+        "operationId": "RoomsController_list",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Jeton `nextCursor` de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "Champs à renvoyer, séparés par des virgules (ex. id,status,guest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "available",
+                "occupied",
+                "cleaning",
+                "maintenance"
+              ]
+            }
+          },
+          {
+            "name": "room_type_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "number | -number | floor | -floor",
+            "schema": {
+              "example": "number",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      },
+      "post": {
+        "operationId": "RoomsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      }
+    },
+    "/v1/rooms/{id}": {
+      "get": {
+        "operationId": "RoomsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      },
+      "patch": {
+        "operationId": "RoomsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "if-match",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag obtenu à la lecture",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Chambres"
+        ]
+      }
+    },
+    "/v1/rooms/{id}/status": {
+      "patch": {
+        "operationId": "RoomsController_setStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "description": "ETag obtenu à la lecture",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoomStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer l’état d’une chambre (propre, nettoyage, maintenance)",
+        "tags": [
+          "Chambres"
+        ]
+      }
+    },
+    "/v1/guests": {
+      "get": {
+        "operationId": "GuestsController_list",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Jeton `nextCursor` de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "Champs à renvoyer, séparés par des virgules (ex. id,status,guest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche sur nom, prénom ou email",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "segment",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "individual",
+                "group",
+                "company"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "last_name | -last_name | created_at | -created_at",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clients"
+        ]
+      },
+      "post": {
+        "operationId": "GuestsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGuestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/v1/guests/{id}": {
+      "get": {
+        "operationId": "GuestsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clients"
+        ]
+      },
+      "patch": {
+        "operationId": "GuestsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "if-match",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGuestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/v1/guests/{id}/stays": {
+      "get": {
+        "operationId": "GuestsController_stays",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Jeton `nextCursor` de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "Champs à renvoyer, séparés par des virgules (ex. id,status,guest)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historique des séjours du client",
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/v1/guests/{id}/erase": {
+      "post": {
+        "operationId": "GuestsController_erase",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Effacement RGPD (anonymisation irréversible)",
+        "tags": [
+          "Clients"
+        ]
+      }
+    },
+    "/v1/availability": {
+      "get": {
+        "operationId": "AvailabilityController_get",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-12",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "description": "Exclu",
+            "schema": {
+              "example": "2026-10-14",
+              "type": "string"
+            }
+          },
+          {
+            "name": "room_type_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Disponibilités et tarifs par type de chambre, nuit par nuit",
+        "tags": [
+          "Disponibilités"
+        ]
+      }
+    },
+    "/v1/reservations": {
+      "get": {
+        "operationId": "ReservationsController_list",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Jeton `nextCursor` de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "Champs à renvoyer, séparés par des virgules (ex. id,status,guest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Un ou plusieurs statuts séparés par des virgules",
+            "schema": {
+              "example": "confirmed,checked_in",
+              "type": "string"
+            }
+          },
+          {
+            "name": "arrival_from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "arrival_to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "guest_id",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reference",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Recherche : référence, nom, prénom ou email du client (2 caractères minimum)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "departure_from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "departure_to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-31",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "arrival_date | -arrival_date | created_at | -created_at",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réservations"
+        ]
+      },
+      "post": {
+        "operationId": "ReservationsController_create",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par opération, conservée 24 h",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Créer une réservation (contrôle de disponibilité atomique)",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/quote": {
+      "get": {
+        "operationId": "ReservationsController_quote",
+        "parameters": [
+          {
+            "name": "room_type_id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "arrival_date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-12",
+              "type": "string"
+            }
+          },
+          {
+            "name": "departure_date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-14",
+              "type": "string"
+            }
+          },
+          {
+            "name": "adults",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": 2,
+              "type": "number"
+            }
+          },
+          {
+            "name": "children",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "example": 0,
+              "type": "number"
+            }
+          },
+          {
+            "name": "board",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "room_only",
+                "half_board",
+                "full_board"
+              ]
+            }
+          },
+          {
+            "name": "exclude_reservation_id",
+            "required": false,
+            "in": "query",
+            "description": "Réservation modifiée, exclue du calcul de disponibilité",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Prix et disponibilité d’un séjour envisagé",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}": {
+      "get": {
+        "operationId": "ReservationsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réservations"
+        ]
+      },
+      "patch": {
+        "operationId": "ReservationsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/history": {
+      "get": {
+        "operationId": "ReservationsController_history",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Historique des opérations sur la réservation",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/room": {
+      "put": {
+        "operationId": "ReservationsController_assignRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Pré-attribuer une chambre (ou retirer l’attribution avec roomId: null)",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/cancel": {
+      "post": {
+        "operationId": "ReservationsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelReservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/check-in": {
+      "post": {
+        "operationId": "ReservationsController_checkIn",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Arrivée : attribue une chambre propre (automatique ou choisie)",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/check-out": {
+      "post": {
+        "operationId": "ReservationsController_checkOut",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckOutDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Départ : la chambre passe en nettoyage",
+        "tags": [
+          "Réservations"
+        ]
+      }
+    },
+    "/v1/planning": {
+      "get": {
+        "operationId": "PlanningController_get",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "description": "Exclu ; 31 jours maximum",
+            "schema": {
+              "example": "2026-10-15",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Planning des chambres : chambres et séjours sur la période (31 jours max.)",
+        "tags": [
+          "Planning"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/folio": {
+      "get": {
+        "operationId": "BillingController_getFolio",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Compte du séjour : lignes, encaissements, solde",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/folio/charges": {
+      "post": {
+        "operationId": "BillingController_addCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChargeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Porter une prestation au compte du séjour",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/folio/charges/{chargeId}": {
+      "delete": {
+        "operationId": "BillingController_removeCharge",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "chargeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/rooms/{id}/charges": {
+      "post": {
+        "operationId": "BillingController_chargeRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChargeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Facturation à la chambre : prestation portée au séjour en cours dans cette chambre",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/payments": {
+      "post": {
+        "operationId": "BillingController_pay",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistrer un acompte, un paiement ou un remboursement",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/reservations/{id}/invoice": {
+      "post": {
+        "operationId": "BillingController_issue",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IssueInvoiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Émettre la facture du séjour (numérotation continue, pièce inaltérable)",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/invoices": {
+      "get": {
+        "operationId": "BillingController_list",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50,
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "description": "Jeton `nextCursor` de la page précédente",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fields",
+            "required": false,
+            "in": "query",
+            "description": "Champs à renvoyer, séparés par des virgules (ex. id,status,guest)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Numéro de pièce ou nom du client",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "invoice",
+                "credit_note"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/invoices/integrity": {
+      "get": {
+        "operationId": "BillingController_verify",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Vérifier empreintes, chaînage et continuité de la numérotation",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/invoices/{id}": {
+      "get": {
+        "operationId": "BillingController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/invoices/{id}/credit-note": {
+      "post": {
+        "operationId": "BillingController_credit",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreditNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Annuler une facture par un avoir total",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/accounting/exports": {
+      "get": {
+        "operationId": "BillingController_export",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "description": "Exclu",
+            "schema": {
+              "example": "2026-11-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Écritures comptables de la période (ventes, banque, caisse, OD)",
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/settings/billing": {
+      "get": {
+        "operationId": "BillingController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Facturation"
+        ]
+      },
+      "put": {
+        "operationId": "BillingController_putSettings",
+        "parameters": [
+          {
+            "name": "If-Match",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Facturation"
+        ]
+      }
+    },
+    "/v1/dashboard": {
+      "get": {
+        "operationId": "DashboardController_get",
+        "parameters": [
+          {
+            "name": "date",
+            "required": false,
+            "in": "query",
+            "description": "Jour affiché (défaut : aujourd’hui, fuseau de l’établissement)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "accept-language",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tableau de bord du jour, adapté aux droits du profil",
+        "tags": [
+          "Reporting"
+        ]
+      }
+    },
+    "/v1/reports/kpis": {
+      "get": {
+        "operationId": "DashboardController_kpi",
+        "parameters": [
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-10-01",
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "required": true,
+            "in": "query",
+            "description": "Exclu",
+            "schema": {
+              "example": "2026-11-01",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Occupation, ADR, RevPAR et durée moyenne de séjour sur une période",
+        "tags": [
+          "Reporting"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API – Système de gestion hôtelière",
+    "description": "Socle V1 : session, menu dynamique, chambres, clients, disponibilités, réservations, réception.",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "reception@hotel.local"
+          },
+          "password": {
+            "type": "string",
+            "example": "ChangeMe!2026"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "MfaVerifyDto": {
+        "type": "object",
+        "properties": {
+          "mfaToken": {
+            "type": "string",
+            "description": "Jeton `mfaToken` renvoyé par /auth/login"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "mfaToken",
+          "code"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "MfaCodeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "CreateNavigationItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "reservations"
+          },
+          "parentKey": {
+            "type": "object",
+            "example": "frontdesk"
+          },
+          "path": {
+            "type": "object",
+            "example": "/reservations"
+          },
+          "icon": {
+            "type": "object",
+            "example": "calendar"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "reservations:read",
+              "reservations:write",
+              "frontdesk:operate",
+              "availability:read",
+              "guests:read",
+              "guests:write",
+              "guests:erase",
+              "rooms:read",
+              "rooms:write",
+              "rooms:status",
+              "reports:read",
+              "admin:navigation",
+              "admin:users",
+              "billing:read",
+              "billing:write",
+              "billing:charge",
+              "billing:override",
+              "billing:export",
+              "settings:billing"
+            ]
+          },
+          "module": {
+            "type": "string",
+            "example": "core",
+            "default": "core"
+          },
+          "labelFr": {
+            "type": "string"
+          },
+          "labelEn": {
+            "type": "string"
+          },
+          "labelAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "key",
+          "labelFr",
+          "labelEn",
+          "labelAr"
+        ]
+      },
+      "UpdateNavigationItemDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "example": "reservations"
+          },
+          "parentKey": {
+            "type": "object",
+            "example": "frontdesk"
+          },
+          "path": {
+            "type": "object",
+            "example": "/reservations"
+          },
+          "icon": {
+            "type": "object",
+            "example": "calendar"
+          },
+          "permission": {
+            "type": "string",
+            "enum": [
+              "reservations:read",
+              "reservations:write",
+              "frontdesk:operate",
+              "availability:read",
+              "guests:read",
+              "guests:write",
+              "guests:erase",
+              "rooms:read",
+              "rooms:write",
+              "rooms:status",
+              "reports:read",
+              "admin:navigation",
+              "admin:users",
+              "billing:read",
+              "billing:write",
+              "billing:charge",
+              "billing:override",
+              "billing:export",
+              "settings:billing"
+            ]
+          },
+          "module": {
+            "type": "string",
+            "example": "core",
+            "default": "core"
+          },
+          "labelFr": {
+            "type": "string"
+          },
+          "labelEn": {
+            "type": "string"
+          },
+          "labelAr": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number",
+            "default": 0
+          },
+          "enabled": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      },
+      "CreateRoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "DBL"
+          },
+          "name": {
+            "type": "string",
+            "example": "Chambre double"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 2
+          },
+          "basePrice": {
+            "type": "number",
+            "example": 9500,
+            "description": "Tarif de base par nuit en unités mineures"
+          },
+          "currency": {
+            "type": "string",
+            "example": "EUR"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "capacity",
+          "basePrice"
+        ]
+      },
+      "UpdateRoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "DBL"
+          },
+          "name": {
+            "type": "string",
+            "example": "Chambre double"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 2
+          },
+          "basePrice": {
+            "type": "number",
+            "example": 9500,
+            "description": "Tarif de base par nuit en unités mineures"
+          },
+          "currency": {
+            "type": "string",
+            "example": "EUR"
+          }
+        }
+      },
+      "CreateRoomDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "example": "204"
+          },
+          "floor": {
+            "type": "number",
+            "example": 2
+          },
+          "roomTypeId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "number",
+          "roomTypeId"
+        ]
+      },
+      "UpdateRoomDto": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "string",
+            "example": "204"
+          },
+          "floor": {
+            "type": "number",
+            "example": 2
+          },
+          "roomTypeId": {
+            "type": "string"
+          }
+        }
+      },
+      "RoomStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "occupied",
+              "cleaning",
+              "maintenance"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CreateGuestDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Amina"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Benali"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+33612345678"
+          },
+          "nationality": {
+            "type": "string",
+            "example": "FR",
+            "description": "Code pays ISO 3166-1 alpha-2"
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "group",
+              "company"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "example": {
+              "pillow": "firm",
+              "floor": "high"
+            }
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "UpdateGuestDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Amina"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Benali"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+33612345678"
+          },
+          "nationality": {
+            "type": "string",
+            "example": "FR",
+            "description": "Code pays ISO 3166-1 alpha-2"
+          },
+          "segment": {
+            "type": "string",
+            "enum": [
+              "individual",
+              "group",
+              "company"
+            ]
+          },
+          "preferences": {
+            "type": "object",
+            "example": {
+              "pillow": "firm",
+              "floor": "high"
+            }
+          }
+        }
+      },
+      "CreateReservationDto": {
+        "type": "object",
+        "properties": {
+          "guestId": {
+            "type": "string",
+            "description": "Client existant (ou fournir `guest`)"
+          },
+          "guest": {
+            "description": "Nouveau client créé avec la réservation",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CreateGuestDto"
+              }
+            ]
+          },
+          "roomTypeId": {
+            "type": "string"
+          },
+          "arrivalDate": {
+            "type": "string",
+            "example": "2026-10-12"
+          },
+          "departureDate": {
+            "type": "string",
+            "example": "2026-10-14",
+            "description": "Date de départ (nuit non incluse)"
+          },
+          "adults": {
+            "type": "number",
+            "example": 2
+          },
+          "children": {
+            "type": "number",
+            "example": 0
+          },
+          "board": {
+            "type": "string",
+            "enum": [
+              "room_only",
+              "half_board",
+              "full_board"
+            ]
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "direct",
+              "phone",
+              "web",
+              "agency",
+              "ota"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "roomTypeId",
+          "arrivalDate",
+          "departureDate",
+          "adults",
+          "board",
+          "channel"
+        ]
+      },
+      "UpdateReservationDto": {
+        "type": "object",
+        "properties": {
+          "roomTypeId": {
+            "type": "string"
+          },
+          "arrivalDate": {
+            "type": "string"
+          },
+          "departureDate": {
+            "type": "string"
+          },
+          "adults": {
+            "type": "number"
+          },
+          "children": {
+            "type": "number"
+          },
+          "board": {
+            "type": "string",
+            "enum": [
+              "room_only",
+              "half_board",
+              "full_board"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      },
+      "AssignRoomDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "object",
+            "nullable": true,
+            "description": "Chambre à pré-attribuer, ou null pour retirer l’attribution"
+          }
+        },
+        "required": [
+          "roomId"
+        ]
+      },
+      "CancelReservationDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Demande du client"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "CheckInDto": {
+        "type": "object",
+        "properties": {
+          "roomId": {
+            "type": "string",
+            "description": "Chambre choisie ; sinon attribution automatique"
+          }
+        }
+      },
+      "CheckOutDto": {
+        "type": "object",
+        "properties": {
+          "overrideBalanceReason": {
+            "type": "string",
+            "description": "Départ malgré un solde non nul (profils habilités) ; motif obligatoire"
+          }
+        }
+      },
+      "ChargeDto": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "restaurant",
+              "bar",
+              "minibar",
+              "spa",
+              "laundry",
+              "phone",
+              "other"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "Dîner – menu du jour"
+          },
+          "quantity": {
+            "type": "number",
+            "default": 1
+          },
+          "unitAmount": {
+            "type": "number",
+            "example": 2800,
+            "description": "Prix unitaire TTC en unités mineures"
+          },
+          "vatRate": {
+            "type": "number",
+            "example": 1000,
+            "description": "Taux de TVA en points de base ; défaut selon la catégorie"
+          }
+        },
+        "required": [
+          "category",
+          "description",
+          "unitAmount"
+        ]
+      },
+      "PaymentDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "deposit",
+              "payment",
+              "refund"
+            ]
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "cash",
+              "card",
+              "transfer",
+              "purchase_order"
+            ]
+          },
+          "amount": {
+            "type": "number",
+            "example": 29000,
+            "description": "Montant positif en unités mineures (un remboursement est enregistré en négatif)"
+          },
+          "pspReference": {
+            "type": "string",
+            "description": "Référence de transaction du prestataire de paiement (obligatoire pour la carte). Jamais le numéro de carte."
+          },
+          "reference": {
+            "type": "string",
+            "description": "Référence du virement ou numéro de bon de commande"
+          }
+        },
+        "required": [
+          "kind",
+          "method",
+          "amount"
+        ]
+      },
+      "IssueInvoiceDto": {
+        "type": "object",
+        "properties": {
+          "lang": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en",
+              "ar"
+            ],
+            "description": "Langue de la facture (défaut : langue du profil)"
+          }
+        }
+      },
+      "CreditNoteDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Erreur sur le nombre de nuits"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "VatDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "TouristTaxDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SellerDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BillingSettingsDto": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "example": "FR",
+            "description": "Pays d’exploitation (ISO 3166-1)"
+          },
+          "vat": {
+            "$ref": "#/components/schemas/VatDto"
+          },
+          "touristTax": {
+            "$ref": "#/components/schemas/TouristTaxDto"
+          },
+          "seller": {
+            "$ref": "#/components/schemas/SellerDto"
+          },
+          "accounts": {
+            "type": "object",
+            "description": "Plan de comptes de l’export comptable"
+          }
+        }
+      }
+    }
+  }
+}

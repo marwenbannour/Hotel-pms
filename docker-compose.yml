@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel
+      POSTGRES_DB: hotel
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ./api
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgres://hotel:hotel@db:5432/hotel
+      JWT_SECRET: ${JWT_SECRET:?Définir JWT_SECRET}
+      HOTEL_NAME: ${HOTEL_NAME:-Hotel}
+      HOTEL_TZ: ${HOTEL_TZ:-Europe/Paris}
+      ENABLED_MODULES: ${ENABLED_MODULES:-core}
+      # Le serveur web appelle l'API depuis le réseau Docker interne.
+      TRUST_PROXY: loopback, uniquelocal
+    ports: ["3000:3000"]
+
+  web:
+    build: ./web
+    depends_on: [api]
+    environment:
+      API_URL: http://api:3000
+      # Mettre à true dès que l'application est servie en HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    ports: ["3001:3001"]
+
+volumes:
+  pgdata:

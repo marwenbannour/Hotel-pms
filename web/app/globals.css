@@ -1,0 +1,70 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+
+  /* Papier et encre */
+  --color-paper: #f4f6f7;
+  --color-surface: #ffffff;
+  --color-line: #d9dfe3;
+  --color-ink: #16324f;
+  --color-ink-soft: #4d6275;
+  --color-ink-faint: #7d8e9c;
+
+  /* États des chambres : les couleurs du tableau des clés */
+  --color-available: #2f7d5b;
+  --color-occupied: #16324f;
+  --color-cleaning: #c8912e;
+  --color-maintenance: #9b3b3b;
+
+  /* Laiton : aujourd'hui, focus, action principale */
+  --color-brass: #a87a2c;
+  --color-brass-soft: #f3e8d2;
+}
+
+html {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-feature-settings: 'tnum' 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+:lang(ar) body {
+  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  line-height: 1.7;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brass);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Barres de prévision : hachures pour distinguer le réalisé du prévu sans dépendre de la couleur */
+.forecast {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-ink) 22%, transparent) 0 4px,
+    color-mix(in srgb, var(--color-ink) 10%, transparent) 4px 8px
+  );
+}
+
+/* Impression des factures : feuille A4 avec marges, sans fond d'application */
+@page {
+  size: A4;
+  margin: 14mm 12mm;
+}
+@media print {
+  html,
+  body {
+    background: #fff;
+  }
+}
