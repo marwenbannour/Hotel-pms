@@ -241,6 +241,7 @@ export function formatters(lang: Lang, currency = 'EUR') {
     longDate: (iso: string) =>
       new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`)),
     weekdayShort: (iso: string) => new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`)),
+    dayMonth: (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`)),
     dayOfMonth: (iso: string) => new Intl.DateTimeFormat(locale, { day: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`)),
     shortDate: (iso: string) =>
       new Intl.DateTimeFormat(locale, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`)),

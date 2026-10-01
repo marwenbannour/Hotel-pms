@@ -1,0 +1,148 @@
+import type { Lang } from './i18n';
+
+const fr = {
+  title: 'Rapports',
+  period: 'Période',
+  presets: { thisMonth: 'Ce mois', lastMonth: 'Mois dernier', next30: '30 prochains jours', thisYear: 'Cette année' },
+  from: 'Du',
+  to: 'Au (inclus)',
+  apply: 'Afficher',
+  invalidRange: 'La date de fin doit être postérieure ou égale à la date de début, sur 366 jours au plus.',
+  loadError: 'Le rapport n’a pas pu être chargé.',
+
+  occupancy: 'Taux d’occupation',
+  revenue: 'CA hébergement',
+  adr: 'Prix moyen (ADR)',
+  revpar: 'RevPAR',
+  roomNights: 'Nuitées vendues',
+  stays: 'Séjours arrivés',
+  alos: 'Durée moyenne de séjour',
+  nights: (n: string) => `${n} nuits`,
+  vsPrevious: 'vs période précédente',
+  points: 'pts',
+  noChange: 'stable',
+
+  occupancyChart: 'Taux d’occupation',
+  revenueChart: 'CA hébergement',
+  perDay: 'par jour',
+  perWeek: 'par semaine',
+  weekOf: (d: string) => `Semaine du ${d}`,
+  forecastLegend: 'Hachuré : prévisionnel (réservations confirmées)',
+  sold: (sold: number, avail: number) => `${sold} / ${avail} chambres`,
+
+  details: 'Détail',
+  showTable: 'Afficher le tableau',
+  hideTable: 'Masquer le tableau',
+  exportCsv: 'Exporter (CSV)',
+  date: 'Date',
+  roomsSold: 'Vendues',
+  roomsAvailable: 'Disponibles',
+  forecast: 'prévisionnel',
+
+  methodTitle: 'Méthode de calcul',
+  method: [
+    'Chambres disponibles : chambres hors maintenance, selon l’état actuel.',
+    'CA hébergement : montant du séjour réparti à parts égales sur ses nuits (hors taxe de séjour et extras).',
+    'Les séjours confirmés à venir sont inclus : les jours futurs sont des prévisions.',
+    'Séjours arrivés et durée moyenne : séjours dont l’arrivée tombe dans la période.',
+  ],
+};
+export type ReportsDict = typeof fr;
+
+const en: ReportsDict = {
+  title: 'Reports',
+  period: 'Period',
+  presets: { thisMonth: 'This month', lastMonth: 'Last month', next30: 'Next 30 days', thisYear: 'This year' },
+  from: 'From',
+  to: 'To (inclusive)',
+  apply: 'Show',
+  invalidRange: 'The end date must be on or after the start date, within 366 days.',
+  loadError: 'The report could not be loaded.',
+
+  occupancy: 'Occupancy',
+  revenue: 'Room revenue',
+  adr: 'Average rate (ADR)',
+  revpar: 'RevPAR',
+  roomNights: 'Room nights sold',
+  stays: 'Stays arriving',
+  alos: 'Average length of stay',
+  nights: (n) => `${n} nights`,
+  vsPrevious: 'vs previous period',
+  points: 'pts',
+  noChange: 'no change',
+
+  occupancyChart: 'Occupancy',
+  revenueChart: 'Room revenue',
+  perDay: 'per day',
+  perWeek: 'per week',
+  weekOf: (d) => `Week of ${d}`,
+  forecastLegend: 'Hatched: forecast (confirmed bookings)',
+  sold: (sold, avail) => `${sold} / ${avail} rooms`,
+
+  details: 'Details',
+  showTable: 'Show table',
+  hideTable: 'Hide table',
+  exportCsv: 'Export (CSV)',
+  date: 'Date',
+  roomsSold: 'Sold',
+  roomsAvailable: 'Available',
+  forecast: 'forecast',
+
+  methodTitle: 'How figures are calculated',
+  method: [
+    'Available rooms: rooms not out of order, based on their current status.',
+    'Room revenue: the stay amount spread evenly over its nights (excluding tourist tax and extras).',
+    'Upcoming confirmed stays are included: future days are forecasts.',
+    'Stays arriving and average length: stays whose arrival falls within the period.',
+  ],
+};
+
+const ar: ReportsDict = {
+  title: 'التقارير',
+  period: 'الفترة',
+  presets: { thisMonth: 'هذا الشهر', lastMonth: 'الشهر الماضي', next30: 'الأيام الثلاثون القادمة', thisYear: 'هذه السنة' },
+  from: 'من',
+  to: 'إلى (ضمنًا)',
+  apply: 'عرض',
+  invalidRange: 'يجب أن يكون تاريخ النهاية مساويًا لتاريخ البداية أو بعده، وفي حدود 366 يومًا.',
+  loadError: 'تعذّر تحميل التقرير.',
+
+  occupancy: 'نسبة الإشغال',
+  revenue: 'إيرادات الإقامة',
+  adr: 'متوسط السعر (ADR)',
+  revpar: 'RevPAR',
+  roomNights: 'الليالي المباعة',
+  stays: 'الإقامات الواصلة',
+  alos: 'متوسط مدة الإقامة',
+  nights: (n) => `${n} ليالٍ`,
+  vsPrevious: 'مقارنة بالفترة السابقة',
+  points: 'نقطة',
+  noChange: 'مستقر',
+
+  occupancyChart: 'نسبة الإشغال',
+  revenueChart: 'إيرادات الإقامة',
+  perDay: 'يوميًا',
+  perWeek: 'أسبوعيًا',
+  weekOf: (d) => `أسبوع ${d}`,
+  forecastLegend: 'المخطط بالخطوط: توقعات (حجوزات مؤكدة)',
+  sold: (sold, avail) => `${sold} / ${avail} غرف`,
+
+  details: 'التفاصيل',
+  showTable: 'عرض الجدول',
+  hideTable: 'إخفاء الجدول',
+  exportCsv: 'تصدير (CSV)',
+  date: 'التاريخ',
+  roomsSold: 'المباعة',
+  roomsAvailable: 'المتاحة',
+  forecast: 'توقع',
+
+  methodTitle: 'طريقة الحساب',
+  method: [
+    'الغرف المتاحة: الغرف غير الخاضعة للصيانة، وفق حالتها الحالية.',
+    'إيرادات الإقامة: مبلغ الإقامة موزّعًا بالتساوي على لياليها (دون ضريبة الإقامة والخدمات الإضافية).',
+    'تُحتسب الإقامات المؤكدة القادمة: الأيام المقبلة توقعات.',
+    'الإقامات الواصلة ومتوسط المدة: الإقامات التي يقع وصولها ضمن الفترة.',
+  ],
+};
+
+export const REPORTS: Record<Lang, ReportsDict> = { fr, en, ar };
