@@ -130,6 +130,20 @@ export interface Guest {
   phone: string | null;
   nationality: string | null;
   segment: string;
+  preferences?: Record<string, unknown>;
+  erased?: boolean;
+  createdAt?: string;
+  version?: number;
+}
+
+export interface GuestStay {
+  id: string;
+  reference: string;
+  status: ReservationStatus;
+  arrivalDate: string;
+  departureDate: string;
+  totalAmount: number;
+  currency: string;
 }
 
 export interface AvailabilityType {
