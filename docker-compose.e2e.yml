@@ -1,0 +1,48 @@
+# Pile isolée pour les tests de bout en bout (web/e2e/run.py) : base en mémoire, ports dédiés,
+# aucune donnée partagée avec la pile de démonstration (docker-compose.yml).
+name: hotel-pms-e2e
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hotel
+      POSTGRES_PASSWORD: hotel
+      POSTGRES_DB: hotel
+    tmpfs: [/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hotel"]
+      interval: 2s
+      retries: 30
+
+  api:
+    build: ./api
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgres://hotel:hotel@db:5432/hotel
+      # Secret propre à cette pile jetable, jamais utilisé ailleurs.
+      JWT_SECRET: e2e-only-0f6b8c2d4e1a9b7c5d3e2f1a0b9c8d7e6f5a4b3c
+      HOTEL_TZ: Europe/Paris
+      ENABLED_MODULES: core
+      TRUST_PROXY: loopback, uniquelocal
+      # Les scénarios se connectent bien plus souvent qu'un humain.
+      AUTH_RATE_LIMIT_PER_MINUTE: "10000"
+      RATE_LIMIT_PER_MINUTE: "100000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 2s
+      retries: 60
+
+  web:
+    build: ./web
+    depends_on:
+      api: { condition: service_healthy }
+    environment:
+      API_URL: http://api:3000
+      COOKIE_SECURE: "false"
+    ports: ["127.0.0.1:${E2E_PORT:-3101}:3001"]
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3001/login >/dev/null || exit 1"]
+      interval: 2s
+      retries: 60

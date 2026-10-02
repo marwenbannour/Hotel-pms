@@ -33,6 +33,38 @@ export interface RoomType {
   id: string;
   code: string;
   name: string;
+  capacity?: number;
+  basePrice?: number;
+  currency?: string;
+  version?: number;
+}
+
+export interface NavigationItem {
+  id: string;
+  key: string;
+  parentKey: string | null;
+  path: string | null;
+  icon: string | null;
+  permission: string | null;
+  module: string;
+  labelFr: string;
+  labelEn: string;
+  labelAr: string;
+  sortOrder: number;
+  enabled: boolean;
+  version: number;
+}
+
+export interface AppUser {
+  id: string;
+  email: string;
+  fullName: string;
+  role: string;
+  locale: 'fr' | 'en' | 'ar';
+  active: boolean;
+  mfaEnabled: boolean;
+  mfaRequired: boolean;
+  createdAt: string;
 }
 
 export interface Movement {
@@ -71,7 +103,11 @@ export interface Dashboard {
   date: string;
   generatedAt: string;
   sections: ('rooms' | 'movements' | 'alerts' | 'kpis')[];
-  rooms?: Record<RoomStatus, number> & { total: number; departingToday: string[] };
+  rooms?: Record<RoomStatus, number> & {
+    total: number;
+    departingToday: string[];
+    byType?: (Record<RoomStatus, number> & { code: string; name: string; arrivalsPending: number })[];
+  };
   movements?: {
     arrivals: Movement[];
     departures: Movement[];
@@ -130,6 +166,20 @@ export interface Guest {
   phone: string | null;
   nationality: string | null;
   segment: string;
+  preferences?: Record<string, unknown>;
+  erased?: boolean;
+  createdAt?: string;
+  version?: number;
+}
+
+export interface GuestStay {
+  id: string;
+  reference: string;
+  status: ReservationStatus;
+  arrivalDate: string;
+  departureDate: string;
+  totalAmount: number;
+  currency: string;
 }
 
 export interface AvailabilityType {

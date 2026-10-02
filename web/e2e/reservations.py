@@ -1,31 +1,25 @@
+"""Réservations : liste, création (idempotence), modification, conflit, annulation, arrivées, arabe, droits."""
 import re, json
-from datetime import date, timedelta, datetime
-from zoneinfo import ZoneInfo
-from playwright.sync_api import sync_playwright, expect
+from datetime import date, timedelta
+from playwright.sync_api import expect
+from common import BASE, launch, login, scenario, shot
 
-BASE = 'http://127.0.0.1:3001'
-hotel_today = datetime.now(ZoneInfo('Europe/Paris')).date()
-utc_today = datetime.now(ZoneInfo('UTC')).date()
 iso = lambda d: d.isoformat()
-print('date hôtel', hotel_today, '| date du poste (UTC)', utc_today)
 
-def login(page, email):
-    page.goto(BASE + '/login')
-    page.fill('input[type=email]', email); page.fill('input[type=password]', 'ChangeMe!2026'); page.click('form button')
-    page.wait_for_url(BASE + '/')
-
-with sync_playwright() as p:
-    import os
-    b = p.chromium.launch(executable_path=os.environ.get('CHROME_PATH') or None)
+with scenario() as p:
+    b = launch(p)
     ctx = b.new_context(viewport={'width': 1440, 'height': 950}, timezone_id='UTC')
     page = ctx.new_page()
     login(page, 'reception@hotel.local')
+    # Jour de l'établissement (fuseau de l'hôtel), tel que l'interface l'utilise ; le poste est en UTC.
+    hotel_today = date.fromisoformat(page.request.get(BASE + '/api/v1/me').json()['hotel']['today'])
+    print('date hôtel', hotel_today)
 
     # 1. Liste + recherche synchronisée avec l'URL
     page.goto(BASE + '/reservations')
     page.wait_for_selector('table tbody tr')
     n_all = page.locator('table tbody tr').count()
-    page.screenshot(path='/tmp/r_list.png')
+    shot(page, 'r_list')
     page.fill('input[type=search]', 'benali')
     page.wait_for_url(re.compile(r'q=benali'))
     page.wait_for_timeout(600)
@@ -47,7 +41,7 @@ with sync_playwright() as p:
     page.get_by_text('Chambre double').click()
     expect(page.get_by_text('290 €')).to_be_visible()          # 2 × (95 + 25 × 2)
     page.get_by_label('Prénom').fill('Jeanne'); page.get_by_label('Nom', exact=True).fill('Testeuse')
-    page.screenshot(path='/tmp/r_new.png', full_page=True)
+    shot(page, 'r_new', full_page=True)
     # Double clic : une seule réservation grâce à la clé d'idempotence
     page.get_by_role('button', name='Créer la réservation').dblclick()
     page.wait_for_url(re.compile(r'/reservations/[0-9a-f-]{36}$'))
@@ -86,7 +80,7 @@ with sync_playwright() as p:
     WD = ['lun.','mar.','mer.','jeu.','ven.','sam.','dim.']; MO = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.']
     hotel_label = f"{WD[hotel_today.weekday()]} {hotel_today.day} {MO[hotel_today.month-1]}"
     expect(page.locator('#history-title + ol').get_by_text(hotel_label).first).to_be_visible()
-    page.screenshot(path='/tmp/r_detail.png', full_page=True)
+    shot(page, 'r_detail', full_page=True)
     print(f'5. annulation OK, message de conflit effacé, historique daté du {hotel_label} (fuseau hôtel)')
 
     # 6. Arrivées du jour + navigation
@@ -98,7 +92,7 @@ with sync_playwright() as p:
     page.wait_for_url(re.compile(r'date='))
     expect(page.get_by_text('Les arrivées et départs s’enregistrent le jour même.')).to_be_visible()
     page.get_by_role('button', name='Aujourd’hui').click()
-    page.screenshot(path='/tmp/r_arrivals.png')
+    shot(page, 'r_arrivals')
     print('6. arrivées du jour, enregistrement et navigation OK')
 
     # 7. Arabe : formulaire en RTL
@@ -108,7 +102,7 @@ with sync_playwright() as p:
     page.locator('fieldset label').filter(has_text='DBL').click()
     page.wait_for_timeout(700)
     assert page.evaluate('document.documentElement.dir') == 'rtl'
-    page.screenshot(path='/tmp/r_new_ar.png', full_page=True)
+    shot(page, 'r_new_ar', full_page=True)
     print('7. formulaire en arabe (RTL) OK')
 
     # 8. Le ménage n'accède pas aux réservations

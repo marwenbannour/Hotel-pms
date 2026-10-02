@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  BedDouble, CalendarDays, ReceiptText, ChartColumn, ConciergeBell, House, LayoutGrid, LogIn, LogOut, Menu, Settings, Sparkles, Users, Utensils, X,
+  BedDouble, CalendarDays, ReceiptText, ChartColumn, ConciergeBell, House, LayoutGrid, LogIn, LogOut, Menu, Settings, Sparkles, UserCog, Users, Utensils, X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -16,7 +16,7 @@ import type { Me, MenuEntry } from '@/lib/types';
 
 const ICONS: Record<string, React.ComponentType<{ className?: string; 'aria-hidden'?: boolean }>> = {
   home: House, concierge: ConciergeBell, calendar: CalendarDays, grid: LayoutGrid, users: Users, sparkles: Sparkles,
-  utensils: Utensils, chart: ChartColumn, receipt: ReceiptText, settings: Settings, bed: BedDouble, menu: Menu, 'log-in': LogIn, 'log-out': LogOut,
+  utensils: Utensils, chart: ChartColumn, receipt: ReceiptText, settings: Settings, bed: BedDouble, menu: Menu, 'user-cog': UserCog, 'log-in': LogIn, 'log-out': LogOut,
 };
 
 export function useMe() {

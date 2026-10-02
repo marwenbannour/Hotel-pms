@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/reservations/StatusBadge';
 import { StayFields, StayValue } from '@/components/reservations/StayFields';
 import { Button, ErrorNote, Field, fieldClass } from '@/components/ui';
 import { api, ApiError } from '@/lib/api';
+import { GUESTS } from '@/lib/i18n-guests';
 import { useI18n, useRes } from '@/lib/lang-context';
 import { splitProblem } from '@/lib/problem';
 import type { Guest, HistoryEntry, Reservation } from '@/lib/types';
@@ -16,7 +17,7 @@ import { useMe } from '../../shell';
 
 export default function ReservationPage() {
   const { id } = useParams<{ id: string }>();
-  const { t, f } = useI18n();
+  const { lang, t, f } = useI18n();
   const r = useRes();
   const qc = useQueryClient();
   const me = useMe();
@@ -230,6 +231,9 @@ export default function ReservationPage() {
             ) : (
               <p className="mt-2 text-[14px] text-ink-soft">{r.noContact}</p>
             )}
+            <Link href={`/guests/${d.guest.id}`} className="mt-3 inline-block text-[14px] font-medium text-brass underline underline-offset-4">
+              {GUESTS[lang].openFile}
+            </Link>
           </aside>
         )}
       </div>

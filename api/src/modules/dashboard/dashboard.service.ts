@@ -107,11 +107,21 @@ export class DashboardService {
         `SELECT rt.code, rt.name, r.status, count(*)::int AS n
          FROM rooms r JOIN room_types rt ON rt.id = r.room_type_id GROUP BY rt.code, rt.name, r.status ORDER BY rt.code`,
       );
-      const types = new Map<string, { code: string; name: string; available: number; occupied: number; cleaning: number; maintenance: number }>();
+      const types = new Map<string, { code: string; name: string; available: number; occupied: number; cleaning: number; maintenance: number; arrivalsPending: number }>();
       for (const r of byType) {
-        const t = types.get(r.code) ?? { code: r.code, name: r.name, available: 0, occupied: 0, cleaning: 0, maintenance: 0 };
+        const t = types.get(r.code) ?? { code: r.code, name: r.name, available: 0, occupied: 0, cleaning: 0, maintenance: 0, arrivalsPending: 0 };
         (t as Record<string, unknown>)[r.status] = r.n;
         types.set(r.code, t);
+      }
+      // Arrivées du jour encore attendues, par type : le ménage sait quelles chambres préparer en priorité.
+      const pending: { code: string; n: number }[] = await this.ds.query(
+        `SELECT rt.code, count(*)::int AS n FROM reservations r JOIN room_types rt ON rt.id = r.room_type_id
+         WHERE r.status = 'confirmed' AND r.arrival_date = $1 GROUP BY rt.code`,
+        [date],
+      );
+      for (const p of pending) {
+        const t = types.get(p.code);
+        if (t) t.arrivalsPending = p.n;
       }
       // Chambres qui se libèrent aujourd'hui : utile au ménage, sans exposer les données clients.
       const departing: { number: string }[] = await this.ds.query(

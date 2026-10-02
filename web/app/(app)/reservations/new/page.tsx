@@ -11,7 +11,7 @@ import { api, newIdempotencyKey } from '@/lib/api';
 import { addDays, nightsBetween } from '@/lib/dates';
 import { useRes } from '@/lib/lang-context';
 import { splitProblem } from '@/lib/problem';
-import type { Channel, Reservation } from '@/lib/types';
+import type { Channel, Guest, Reservation } from '@/lib/types';
 import { useMe } from '../../shell';
 
 const CHANNELS: Channel[] = ['direct', 'phone', 'web', 'agency', 'ota'];
@@ -30,6 +30,14 @@ export default function NewReservationPage() {
     }
   }, [today, stay]);
   const [guest, setGuest] = useState<GuestChoice>(emptyGuestChoice);
+  // Depuis la fiche client (?guestId=…) : le client est présélectionné.
+  useEffect(() => {
+    const guestId = new URLSearchParams(window.location.search).get('guestId');
+    if (!guestId) return;
+    api<Guest>(`/guests/${guestId}`)
+      .then(({ data }) => { if (!data.erased) setGuest((cur) => (cur.existing ? cur : { ...cur, existing: data })); })
+      .catch(() => {});
+  }, []);
   const [channel, setChannel] = useState<Channel>('phone');
   const [notes, setNotes] = useState('');
   // Une clé par formulaire : un double envoi ne crée jamais deux réservations.

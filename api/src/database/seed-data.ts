@@ -19,6 +19,7 @@ export const DEFAULT_NAVIGATION: Partial<NavigationItem>[] = [
   { key: 'admin', path: null, icon: 'settings', permission: null, labelFr: 'Administration', labelEn: 'Administration', labelAr: 'الإدارة', sortOrder: 90 },
   { key: 'admin.rooms', parentKey: 'admin', path: '/admin/rooms', icon: 'bed', permission: 'rooms:write', labelFr: 'Chambres', labelEn: 'Rooms', labelAr: 'الغرف', sortOrder: 91 },
   { key: 'admin.menu', parentKey: 'admin', path: '/admin/menu', icon: 'menu', permission: 'admin:navigation', labelFr: 'Menu', labelEn: 'Menu', labelAr: 'القائمة', sortOrder: 92 },
+  { key: 'admin.users', parentKey: 'admin', path: '/admin/users', icon: 'user-cog', permission: 'admin:users', labelFr: 'Utilisateurs', labelEn: 'Users', labelAr: 'المستخدمون', sortOrder: 93 },
 ];
 
 export const DEMO_PASSWORD = 'ChangeMe!2026';
