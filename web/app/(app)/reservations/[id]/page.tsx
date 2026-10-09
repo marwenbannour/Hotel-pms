@@ -25,6 +25,9 @@ export default function ReservationPage() {
   const tz = me.data?.hotel.timezone;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState<(StayValue & { notes: string }) | null>(null);
+  // Version modifiée : la fiche peut se recharger pendant la saisie (modification d'une autre
+  // personne signalée en direct) ; l'enregistrement doit alors être refusé (412), pas l'écraser.
+  const [base, setBase] = useState<Reservation | null>(null);
   const [conflict, setConflict] = useState(false);
   const [reason, setReason] = useState('');
   const cancelDialog = useRef<HTMLDialogElement>(null);
@@ -56,7 +59,7 @@ export default function ReservationPage() {
 
   const save = useMutation({
     mutationFn: () => {
-      const cur = res.data!;
+      const cur = base!;
       const d = draft!;
       const body: Record<string, unknown> = {};
       if (d.arrivalDate !== cur.arrivalDate) body.arrivalDate = d.arrivalDate;
@@ -103,6 +106,7 @@ export default function ReservationPage() {
   const name = `${d.guest.firstName ?? ''} ${d.guest.lastName ?? ''}`.trim();
   const startEdit = () => {
     setConflict(false);
+    setBase(d);
     setDraft({
       arrivalDate: d.arrivalDate, departureDate: d.departureDate, adults: d.adults, children: d.children,
       board: d.board, roomTypeId: d.roomType.id, notes: d.notes ?? '',

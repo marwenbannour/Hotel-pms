@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { api, ApiError } from '@/lib/api';
 import { useI18n } from '@/lib/lang-context';
 import type { Room, RoomStatus, RoomType } from '@/lib/types';
+import { CARD, CardLink, CardTitle } from './card';
 
 /** Mêmes transitions manuelles que l'API (occupée ne se libère que par le départ). */
 export const TRANSITIONS: Record<RoomStatus, RoomStatus[]> = {
@@ -14,16 +15,31 @@ export const TRANSITIONS: Record<RoomStatus, RoomStatus[]> = {
   occupied: ['maintenance'],
 };
 
+/** Couleur pleine de l'état : repères (légendes, pastilles) et petites tuiles. */
 export const STATUS_STYLE: Record<RoomStatus, string> = {
-  available: 'bg-available text-white',
+  available: 'bg-available text-navy',
   occupied: 'bg-occupied text-white',
-  cleaning: 'bg-cleaning text-ink',
+  cleaning: 'bg-cleaning text-navy',
   // Hachures en plus de la couleur : l'état reste lisible sans distinguer les couleurs.
   maintenance:
     'bg-maintenance text-white bg-[repeating-linear-gradient(135deg,transparent_0_6px,rgba(255,255,255,.16)_6px_12px)]',
 };
 
+/** Tuiles de chambre (charte HOTELIA) : teinte claire et texte foncé, pleine pour occupée et maintenance. */
+export const TILE_STYLE: Record<RoomStatus, string> = {
+  available: 'bg-available-soft text-available-text ring-1 ring-inset ring-available/60',
+  occupied: 'bg-occupied text-white',
+  cleaning: 'bg-cleaning-soft text-cleaning-text ring-1 ring-inset ring-cleaning/70',
+  maintenance: STATUS_STYLE.maintenance,
+};
+
 const ORDER: RoomStatus[] = ['available', 'occupied', 'cleaning', 'maintenance'];
+const DOT: Record<RoomStatus, string> = {
+  available: 'bg-available',
+  occupied: 'bg-occupied',
+  cleaning: 'bg-cleaning',
+  maintenance: 'bg-maintenance',
+};
 
 interface Props {
   rooms: Room[];
@@ -31,11 +47,14 @@ interface Props {
   counts?: Record<RoomStatus, number>;
   departingRoomNumbers: Set<string>;
   canChangeStatus: boolean;
+  /** Écrans accessibles au profil, pour le lien vers la liste complète. */
+  allowed: Set<string>;
 }
 
-export function RoomBoard({ rooms, roomTypes, counts, departingRoomNumbers, canChangeStatus }: Props) {
+export function RoomBoard({ rooms, roomTypes, counts, departingRoomNumbers, canChangeStatus, allowed }: Props) {
   const { t } = useI18n();
   const qc = useQueryClient();
+  const [floorFilter, setFloorFilter] = useState('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -71,39 +90,41 @@ export function RoomBoard({ rooms, roomTypes, counts, departingRoomNumbers, canC
     const f = r.floor ?? 0;
     floors.set(f, [...(floors.get(f) ?? []), r]);
   }
-  const sortedFloors = [...floors.entries()].sort(([a], [b]) => b - a);
+  const allFloors = [...floors.keys()].sort((a, b) => a - b);
+  const sortedFloors = [...floors.entries()]
+    .filter(([floor]) => floorFilter === 'all' || String(floor) === floorFilter)
+    .sort(([a], [b]) => a - b);
 
   return (
-    <section aria-labelledby="board-title">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h2 id="board-title" className="text-xl font-semibold tracking-tight">{t.roomBoard}</h2>
-        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-soft">
-          {ORDER.map((s) => (
-            <li key={s} className="flex items-center gap-1.5">
-              <span className={`inline-block size-3 rounded-[3px] ${STATUS_STYLE[s]}`} aria-hidden />
-              {t.statuses[s]}
-              {counts && <span className="font-medium text-ink">{counts[s]}</span>}
-            </li>
-          ))}
-          <li className="flex items-center gap-1.5">
-            <span className="inline-block size-2.5 rounded-full border-2 border-brass bg-white" aria-hidden />
-            {t.departingToday}
-          </li>
-        </ul>
-      </div>
+    <section aria-labelledby="board-title" className={`${CARD} flex flex-col gap-4 p-5`}>
+      <CardTitle
+        id="board-title"
+        action={
+          allFloors.length > 1 && (
+            <select
+              value={floorFilter}
+              onChange={(e) => setFloorFilter(e.target.value)}
+              aria-label={t.floor}
+              className="rounded-lg border border-line bg-surface px-3 py-1.5 text-[13px] text-ink-soft"
+            >
+              <option value="all">{t.allFloors}</option>
+              {allFloors.map((fl) => (
+                <option key={fl} value={String(fl)}>{t.floor} {fl}</option>
+              ))}
+            </select>
+          )
+        }
+      >
+        {t.roomStatus}
+      </CardTitle>
 
-      {error && (
-        <p role="alert" className="mb-3 text-maintenance">{error}</p>
-      )}
+      {error && <p role="alert" className="text-maintenance">{error}</p>}
 
-      <div ref={boardRef} className="space-y-3 rounded-lg bg-surface p-4 ring-1 ring-line sm:p-5">
+      <div ref={boardRef} className="space-y-4">
         {sortedFloors.map(([floor, list]) => (
-          <div key={floor} className="flex items-start gap-4">
-            <div className="w-10 shrink-0 pt-3 text-center text-ink-faint" title={`${t.floor} ${floor}`}>
-              <span className="text-[12px]">{t.floorShort}</span>
-              <span className="block text-lg leading-5 font-medium text-ink-soft">{floor}</span>
-            </div>
-            <ul className="flex flex-1 flex-wrap gap-2">
+          <div key={floor}>
+            <h3 className="mb-2 font-sans text-[13px] font-semibold text-ink">{t.floor} {floor}</h3>
+            <ul className="flex flex-wrap gap-2">
               {list
                 .sort((a, b) => a.number.localeCompare(b.number, undefined, { numeric: true }))
                 .map((room) => {
@@ -113,14 +134,17 @@ export function RoomBoard({ rooms, roomTypes, counts, departingRoomNumbers, canC
                   }`;
                   const tile = (
                     <>
-                      <span className="block text-[17px] leading-5 font-semibold">{room.number}</span>
-                      <span className="block text-[11px] leading-4 opacity-80">{typeCode.get(room.roomTypeId)}</span>
+                      <span className="flex items-baseline justify-between gap-1">
+                        <span className="text-[15px] leading-5 font-semibold">{room.number}</span>
+                        <span className="text-[10px] leading-4 opacity-75">{typeCode.get(room.roomTypeId)}</span>
+                      </span>
+                      <span className="block truncate text-[11px] leading-4 opacity-90">{t.statuses[room.status]}</span>
                       {departing && (
-                        <span className="absolute -top-1 -end-1 size-3 rounded-full border-2 border-brass bg-white" aria-hidden />
+                        <span className="absolute -top-1 -end-1 size-3 rounded-full border-2 border-gold bg-white" aria-hidden />
                       )}
                     </>
                   );
-                  const tileClass = `relative block h-14 w-[4.25rem] rounded-md px-2 py-1.5 text-start ${STATUS_STYLE[room.status]}`;
+                  const tileClass = `relative block h-[3.25rem] w-[6.5rem] rounded-lg px-2.5 py-1.5 text-start ${TILE_STYLE[room.status]}`;
                   return (
                     <li key={room.id} className="relative">
                       {canChangeStatus ? (
@@ -162,6 +186,23 @@ export function RoomBoard({ rooms, roomTypes, counts, departingRoomNumbers, canC
             </ul>
           </div>
         ))}
+      </div>
+
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-line pt-4">
+        <ul className="flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-ink-soft">
+          {ORDER.map((s) => (
+            <li key={s} className="flex items-center gap-1.5">
+              <span className={`inline-block size-2.5 rounded-full ${DOT[s]}`} aria-hidden />
+              {t.statuses[s]}
+              {counts && <span className="font-medium text-ink">{counts[s]}</span>}
+            </li>
+          ))}
+          <li className="flex items-center gap-1.5">
+            <span className="inline-block size-2.5 rounded-full border-2 border-gold bg-white" aria-hidden />
+            {t.departingToday}
+          </li>
+        </ul>
+        <CardLink href="/housekeeping" allowed={allowed}>{t.seeRooms}</CardLink>
       </div>
     </section>
   );

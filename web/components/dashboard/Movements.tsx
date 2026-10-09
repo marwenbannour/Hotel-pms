@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
+import { usePhone } from '@/components/ui';
 import { api, ApiError } from '@/lib/api';
 import { BILLING } from '@/lib/i18n-billing';
 import { useI18n } from '@/lib/lang-context';
@@ -14,13 +15,13 @@ interface Props {
   canOperate: boolean;
 }
 
-export function Movements({ kind, rows, canOperate }: Props) {
-  const { lang, t } = useI18n();
+/** Arrivée ou départ d'une ligne : action, erreurs par réservation, libellé d'état. */
+export function useStayAction(kind: Props['kind']) {
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const action = kind === 'arrivals' ? 'check-in' : 'check-out';
   const actionable = (m: Movement) => (kind === 'arrivals' ? m.status === 'confirmed' : m.status === 'checked_in');
-  const pending = rows.filter(actionable).length;
 
   const run = useMutation({
     mutationFn: (m: Movement) => api(`/reservations/${m.id}/${action}`, { method: 'POST', json: {} }),
@@ -35,7 +36,47 @@ export function Movements({ kind, rows, canOperate }: Props) {
 
   const statusLabel = (m: Movement) =>
     m.status === 'confirmed' ? t.confirmed : m.status === 'checked_in' ? t.checkedIn : t.checkedOut;
+  return { run, errors, actionable, statusLabel };
+}
+
+export function Movements({ kind, rows, canOperate }: Props) {
+  const { lang, t } = useI18n();
+  const phone = usePhone();
+  const { run, errors, actionable, statusLabel } = useStayAction(kind);
+  const pending = rows.filter(actionable).length;
   const title = kind === 'arrivals' ? t.arrivals : t.departures;
+
+  const guestCell = (m: Movement) => (
+    <>
+      <Link href={`/reservations/${m.id}`} className="font-medium underline-offset-4 hover:underline">{m.guestName}</Link>
+      <span className="block text-[13px] text-ink-faint">
+        <span dir="ltr">{m.reference}</span>, {t.boards[m.board]}
+      </span>
+      {m.notes && <span className="mt-1 block text-[13px] text-ink-soft">{m.notes}</span>}
+      {errors[m.id] && (
+        <span role="alert" className="mt-1 block text-[13px] text-maintenance">
+          {errors[m.id]}{' '}
+          {/* Départ refusé pour solde dû : accès direct au compte du séjour. */}
+          <Link href={`/reservations/${m.id}#billing-title`} className="font-medium underline underline-offset-2">
+            {BILLING[lang].billing}
+          </Link>
+        </span>
+      )}
+    </>
+  );
+  const actionCell = (m: Movement, className: string) =>
+    canOperate && actionable(m) ? (
+      <button
+        type="button"
+        onClick={() => run.mutate(m)}
+        disabled={run.isPending && run.variables?.id === m.id}
+        className={`rounded-md bg-ink font-medium whitespace-nowrap text-white hover:bg-ink/90 disabled:opacity-60 ${className}`}
+      >
+        {kind === 'arrivals' ? t.checkIn : t.checkOut}
+      </button>
+    ) : (
+      <span className="text-[14px] text-ink-soft">{statusLabel(m)}</span>
+    );
 
   return (
     <section aria-labelledby={`${kind}-title`} className="min-w-0">
@@ -49,6 +90,19 @@ export function Movements({ kind, rows, canOperate }: Props) {
         <p className="rounded-lg bg-surface px-4 py-6 text-ink-soft ring-1 ring-line">
           {kind === 'arrivals' ? t.noArrivals : t.noDepartures}
         </p>
+      ) : phone ? (
+        // Téléphone : une carte par client, action au pouce sur toute la largeur.
+        <ul className="divide-y divide-line rounded-lg bg-surface ring-1 ring-line">
+          {rows.map((m) => (
+            <li key={m.id} className="space-y-2 px-4 py-3">
+              <div>{guestCell(m)}</div>
+              <p className="text-[14px] text-ink-soft">
+                {m.roomType} · {t.room} <span className="font-medium text-ink">{m.roomNumber ?? '–'}</span> · {t.guests} {m.adults + m.children}
+              </p>
+              {actionCell(m, 'block min-h-11 w-full px-3 text-[15px]')}
+            </li>
+          ))}
+        </ul>
       ) : (
         <div className="overflow-x-auto rounded-lg bg-surface ring-1 ring-line">
           <table className="w-full min-w-[520px] text-start">
@@ -64,39 +118,11 @@ export function Movements({ kind, rows, canOperate }: Props) {
             <tbody>
               {rows.map((m) => (
                 <tr key={m.id} className="border-b border-line last:border-0 align-top">
-                  <td className="px-4 py-3">
-                    <Link href={`/reservations/${m.id}`} className="font-medium underline-offset-4 hover:underline">{m.guestName}</Link>
-                    <span className="block text-[13px] text-ink-faint">
-                      <span dir="ltr">{m.reference}</span>, {t.boards[m.board]}
-                    </span>
-                    {m.notes && <span className="mt-1 block text-[13px] text-ink-soft">{m.notes}</span>}
-                    {errors[m.id] && (
-                      <span role="alert" className="mt-1 block text-[13px] text-maintenance">
-                        {errors[m.id]}{' '}
-                        {/* Départ refusé pour solde dû : accès direct au compte du séjour. */}
-                        <Link href={`/reservations/${m.id}#billing-title`} className="font-medium underline underline-offset-2">
-                          {BILLING[lang].billing}
-                        </Link>
-                      </span>
-                    )}
-                  </td>
+                  <td className="px-4 py-3">{guestCell(m)}</td>
                   <td className="px-2 py-3">{m.roomType}</td>
                   <td className="px-2 py-3 font-medium">{m.roomNumber ?? '–'}</td>
                   <td className="px-2 py-3">{m.adults + m.children}</td>
-                  <td className="px-4 py-2.5 text-end">
-                    {canOperate && actionable(m) ? (
-                      <button
-                        type="button"
-                        onClick={() => run.mutate(m)}
-                        disabled={run.isPending && run.variables?.id === m.id}
-                        className="rounded-md bg-ink px-3 py-1.5 text-[14px] font-medium whitespace-nowrap text-white hover:bg-ink/90 disabled:opacity-60"
-                      >
-                        {kind === 'arrivals' ? t.checkIn : t.checkOut}
-                      </button>
-                    ) : (
-                      <span className="text-[14px] text-ink-soft">{statusLabel(m)}</span>
-                    )}
-                  </td>
+                  <td className="px-4 py-2.5 text-end">{actionCell(m, 'px-3 py-1.5 text-[14px]')}</td>
                 </tr>
               ))}
             </tbody>

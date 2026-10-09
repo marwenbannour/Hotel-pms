@@ -10,5 +10,7 @@ export class RefreshToken {
   @Column() tokenHash: string;
   @Column({ type: 'timestamptz' }) expiresAt: Date;
   @Column({ type: 'timestamptz', nullable: true }) revokedAt: Date | null;
+  /** Remplacé par un nouveau jeton (rotation normale), par opposition à une révocation. */
+  @Column({ type: 'timestamptz', nullable: true }) rotatedAt: Date | null;
   @CreateDateColumn({ type: 'timestamptz' }) createdAt: Date;
 }

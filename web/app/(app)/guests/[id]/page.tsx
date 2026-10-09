@@ -23,6 +23,8 @@ export default function GuestPage() {
   const can = (p: string) => !!me.data?.permissions.includes(p);
   const tz = me.data?.hotel.timezone;
   const [draft, setDraft] = useState<GuestDraft | null>(null);
+  // Version modifiée : si la fiche se recharge pendant la saisie, l'enregistrement est refusé (412).
+  const [base, setBase] = useState<Guest | null>(null);
   const [conflict, setConflict] = useState(false);
   const [confirmName, setConfirmName] = useState('');
   const eraseDialog = useRef<HTMLDialogElement>(null);
@@ -44,7 +46,7 @@ export default function GuestPage() {
 
   const save = useMutation({
     mutationFn: () => {
-      const cur = guest.data!;
+      const cur = base!;
       return api<Guest>(`/guests/${id}`, { method: 'PATCH', json: guestBody(draft!, cur), headers: { 'If-Match': `"${cur.version}"` } });
     },
     onSuccess: ({ data }) => {
@@ -109,7 +111,7 @@ export default function GuestPage() {
             </Link>
           )}
           {editable && (
-            <Button variant="secondary" onClick={() => { setConflict(false); save.reset(); setDraft(draftFromGuest(d)); }}>
+            <Button variant="secondary" onClick={() => { setConflict(false); save.reset(); setBase(d); setDraft(draftFromGuest(d)); }}>
               {g.modify}
             </Button>
           )}

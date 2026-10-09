@@ -1,25 +1,51 @@
 @import 'tailwindcss';
 
+/* Charte HOTELIA (mêmes valeurs que l'application mobile, design/tokens.json) : marine et or. */
 @theme {
-  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  --font-sans: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  /* Titres et chiffres clés */
+  --font-display: 'Poppins', 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
 
-  /* Papier et encre */
-  --color-paper: #f4f6f7;
+  /* Fond, surfaces, texte */
+  --color-paper: #f6f7f9;
   --color-surface: #ffffff;
-  --color-line: #d9dfe3;
-  --color-ink: #16324f;
-  --color-ink-soft: #4d6275;
-  --color-ink-faint: #7d8e9c;
+  --color-line: #e6e8ec;
+  --color-ink: #0d182a;
+  --color-ink-soft: #5b6472;
+  --color-ink-faint: #7b8492;
 
-  /* États des chambres : les couleurs du tableau des clés */
-  --color-available: #2f7d5b;
-  --color-occupied: #16324f;
-  --color-cleaning: #c8912e;
-  --color-maintenance: #9b3b3b;
+  /* Marine (menu) et or (élément actif, accent) */
+  --color-navy: #0d182a;
+  --color-navy-700: #1e2a3b;
+  --color-gold: #d4af37;
+  --color-gold-soft: #fbf4de;
 
-  /* Laiton : aujourd'hui, focus, action principale */
-  --color-brass: #a87a2c;
-  --color-brass-soft: #f3e8d2;
+  /* États des chambres : couleur pleine pour les repères, teinte claire et texte foncé pour les tuiles */
+  --color-available: #22c55e;
+  --color-available-soft: #f0fdf4;
+  --color-available-text: #15803d;
+  --color-occupied: #0d182a;
+  --color-cleaning: #f59e0b;
+  --color-cleaning-soft: #fffbeb;
+  --color-cleaning-text: #b45309;
+  --color-maintenance: #dc2626;
+  --color-info: #0ea5e9;
+  --color-info-soft: #f0f9ff;
+  --color-info-text: #0369a1;
+
+  /* Or foncé, lisible en texte : aujourd'hui, focus, liens d'action */
+  --color-brass: #8a6a12;
+  --color-brass-soft: #fbf4de;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+}
+
+:lang(ar) :is(h1, h2, h3) {
+  font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
 }
 
 html {
@@ -30,7 +56,7 @@ html {
 }
 
 :lang(ar) body {
-  font-family: 'IBM Plex Sans Arabic', 'IBM Plex Sans', system-ui, sans-serif;
+  font-family: 'IBM Plex Sans Arabic', 'Inter', system-ui, sans-serif;
   line-height: 1.7;
 }
 

@@ -1,0 +1,22 @@
+{
+  "appId": "com.hotelpms.app",
+  "appName": "Hôtel",
+  "webDir": "www",
+  "android": {
+    "appendUserAgent": "HotelPMSApp/1.0",
+    "backgroundColor": "#f4f6f7"
+  },
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true,
+    "allowNavigation": ["*"]
+  },
+  "plugins": {
+    "CapacitorHttp": { "enabled": false },
+    "SystemBars": {
+      "insetsHandling": "native",
+      "initialViewportFitValueHint": "cover",
+      "style": "LIGHT"
+    }
+  }
+}

@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
+import { downloadCsv } from '@/lib/csv';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, Suspense, useEffect, useState } from 'react';
 import { Bar, BarChart } from '@/components/reports/BarChart';
@@ -175,14 +176,9 @@ function Reports() {
     const money = (minor: number) => (minor / 100).toFixed(2);
     const head = ['date', 'rooms_available', 'rooms_sold', 'occupancy_rate', 'revenue', 'adr', 'revpar', 'forecast'];
     const rows = data.daily.map((d) =>
-      [d.date, d.roomsAvailable, d.roomsSold, d.occupancyRate.toFixed(1), money(d.revenue), money(d.adr), money(d.revpar), isForecast(d.date) ? 1 : 0].join(';'),
+      [d.date, d.roomsAvailable, d.roomsSold, d.occupancyRate.toFixed(1), money(d.revenue), money(d.adr), money(d.revpar), isForecast(d.date) ? 1 : 0],
     );
-    const blob = new Blob([`﻿${[head.join(';'), ...rows].join('\r\n')}\r\n`], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `rapport-${data.from}_${to}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    downloadCsv(`rapport-${data.from}_${to}.csv`, head, rows);
   };
 
   return (

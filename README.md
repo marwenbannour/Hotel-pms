@@ -5,7 +5,9 @@ Mise en œuvre de l’option A du cahier des charges v1.1.
 | Dossier | Contenu |
 | --- | --- |
 | `api/` | API REST NestJS 11 et PostgreSQL : session et MFA, menu dynamique, chambres, clients, disponibilités, réservations (recherche, devis, historique, pré-attribution des chambres), planning, réception, facturation (compte du séjour, encaissements, factures et avoirs inaltérables, export comptable), tableau de bord et indicateurs |
-| `web/` | Application Next.js 16 : connexion, tableau de bord, réservations, arrivées et départs, planning des chambres, facturation |
+| `web/` | Application Next.js 16 : connexion, tableau de bord, réservations, arrivées et départs, planning des chambres, facturation, restaurant. Installable sur téléphone, synchronisée en direct avec le tableau de bord |
+| `mobile/` | Application Android (Capacitor) : ouvre l’application web de l’hôtel en plein écran, adresse du serveur saisie au premier lancement |
+| `mobile-expo/` | Même application en Expo (Android et iOS) : `npx expo start` puis Expo Go |
 
 ## Démarrage rapide avec Docker
 
@@ -18,7 +20,7 @@ docker compose exec api node dist/database/seed.js --demo-day
 
 Le fichier `.env` (non versionné) est lu par toutes les commandes `docker compose`. Commandes utiles : `docker compose ps`, `docker compose logs -f api`, `docker compose down` (ajouter `-v` pour effacer la base).
 
-Ouvrez http://localhost:3001 et connectez-vous avec `reception@hotel.local`, `menage@hotel.local` ou `admin@hotel.local` (mot de passe `ChangeMe!2026`). Le compte direction vous guidera pour activer la double authentification.
+Ouvrez http://localhost:3001 et connectez-vous avec `reception@hotel.local`, `menage@hotel.local`, `restaurant@hotel.local` ou `admin@hotel.local` (mot de passe `ChangeMe!2026`). Sur téléphone, l’application s’installe sur l’écran d’accueil (voir `web/README.md`, « Application mobile »). Le compte direction vous guidera pour activer la double authentification.
 
 ## Développement
 

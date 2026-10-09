@@ -16,7 +16,7 @@ for _stream in (sys.stdout, sys.stderr):
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
-SCENARIOS = ['reservations', 'planning', 'billing', 'guests', 'housekeeping', 'reports', 'admin']
+SCENARIOS = ['reservations', 'planning', 'billing', 'guests', 'housekeeping', 'reports', 'admin', 'live', 'mobile']
 PORT = os.environ.get('E2E_PORT', '3101')
 COMPOSE = ['docker', 'compose', '-f', os.path.join(ROOT, 'docker-compose.e2e.yml')]
 

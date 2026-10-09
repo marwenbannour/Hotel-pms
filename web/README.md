@@ -13,9 +13,21 @@ Interface Next.js 16 (React 19, TanStack Query, Tailwind 4) du cahier des charge
 | Clients | Liste avec recherche et segment, création, fiche (coordonnées, modification, séjours, nouvelle réservation présélectionnée), anonymisation RGPD |
 | Ménage | Écran pour téléphone : priorités selon les arrivées du jour, chambres à nettoyer, départs du jour, hors service, filtre par étage, annulation de la dernière action |
 | Rapports | Occupation, CA hébergement, ADR, RevPAR, nuitées, séjours, durée moyenne, comparaison avec la période précédente, graphiques par jour ou par semaine, tableau et export CSV |
+| Restaurant | Écran pour téléphone : facturation à la chambre (chambres occupées en direct, catégorie, quantité, prix). Module `restaurant` de `ENABLED_MODULES`, réservé aux profils `billing:charge` |
 | Administration | Types de chambre et chambres, menu (libellés en trois langues, ordre, permission, masquage), utilisateurs (création, profil, mot de passe, double authentification, désactivation) |
 
-Les entrées des modules non activés (restaurant) affichent un écran d’attente.
+Les entrées des modules non activés affichent un écran d’attente.
+
+## Application mobile
+
+L’application s’installe sur téléphone (Android : « Installer l’application » ; iOS : Partager › « Sur l’écran d’accueil ») et s’ouvre en plein écran, sans barre d’adresse. Il n’y a pas d’application séparée : ce sont les mêmes écrans, adaptés au téléphone.
+
+- **Onglets** en bas de l’écran : les quatre premiers écrans du menu du profil (ménage : tableau de bord et ménage ; réception : arrivées, départs, réservations ; restaurant : facturation à la chambre). « Plus » ouvre le menu complet. L’ordre se règle dans Administration › Menu.
+- **Synchronisation en direct** avec le tableau de bord : chaque modification (arrivée, départ, état d’une chambre, consommation, réservation) est signalée par l’API (`GET /v1/events`, Server-Sent Events) et les écrans ouverts se rechargent aussitôt, sur téléphone comme au bureau. Coupure de plus de 8 s : bandeau « Connexion perdue », puis tout est rechargé à la reconnexion. Téléphone verrouillé : le flux est fermé, puis rouvert au retour.
+- **En ligne uniquement** : rien n’est conservé sur le téléphone. Sans réseau, une page « Pas de connexion » remplace l’erreur du navigateur (service worker `/sw.js`, qui ne met rien en cache).
+- Manifeste `/manifest.webmanifest` (nom dans la langue choisie), icônes générées par `app/icons/[file]/route.tsx`.
+- L’installation exige HTTPS (ou `localhost`) : en production, servir l’application derrière un proxy TLS.
+- Application Android (APK) : voir `../mobile`. Elle charge ces mêmes écrans ; l’application web la reconnaît à son agent utilisateur (`HotelPMSApp/`) pour afficher « Changer de serveur ».
 
 ## Démarrage
 
@@ -59,7 +71,7 @@ Le « jour » de l’interface est celui de l’établissement, fourni par l’A
 
 ## Tests de bout en bout
 
-`e2e/` contient sept scénarios Playwright qui rejouent les parcours complets dans un vrai navigateur, sur la journée de démonstration :
+`e2e/` contient neuf scénarios Playwright qui rejouent les parcours complets dans un vrai navigateur, sur la journée de démonstration :
 
 | Scénario | Parcours |
 | --- | --- |
@@ -70,6 +82,8 @@ Le « jour » de l’interface est celui de l’établissement, fourni par l’A
 | `housekeeping` | Format téléphone : à nettoyer, annulation, hors service, filtre par étage, arabe |
 | `reports` | Période, indicateurs et comparaison, info-bulle, regroupement par semaine, tableau, CSV, arabe |
 | `admin` | Types et chambres, menu, utilisateurs (création, mot de passe, désactivation), restrictions du profil IT |
+| `live` | Deux postes : modification visible sans rechargement, conflit d’édition sur une fiche client, bandeau de coupure |
+| `mobile` | Installation (manifeste, icônes, service worker), onglets par profil, restaurant sur téléphone, arrivée et ménage sur téléphone reflétés en direct sur le tableau de bord |
 
 `e2e/run.py` démarre une pile Docker isolée (`docker-compose.e2e.yml` : base en mémoire, port 3101, aucune donnée partagée avec la démonstration), **recrée la base avant chaque scénario** et affiche un bilan :
 

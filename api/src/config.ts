@@ -15,6 +15,11 @@ export const appConfig = {
     accessTtlSeconds: 15 * 60,
     mfaTtlSeconds: 5 * 60,
     refreshTtlDays: 30,
+    /**
+     * Délai pendant lequel un jeton qui vient d'être remplacé reste accepté : plusieurs instances
+     * du serveur web (hébergement serverless) peuvent rafraîchir la même session simultanément.
+     */
+    refreshGraceSeconds: 30,
   },
   hotel: {
     name: env.HOTEL_NAME ?? 'Hotel',

@@ -7,6 +7,8 @@ export interface AuthUser {
   permissions: readonly Permission[];
   /** Vrai si le profil exige la MFA et que l'utilisateur ne l'a pas encore activée. */
   mfaEnrollmentRequired: boolean;
+  /** Expiration du jeton d'accès présenté (secondes depuis l'époque Unix). */
+  tokenExpiresAt?: number;
 }
 
 export const IS_PUBLIC = 'isPublic';

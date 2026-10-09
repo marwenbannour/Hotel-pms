@@ -13,7 +13,7 @@ export const DEFAULT_NAVIGATION: Partial<NavigationItem>[] = [
   { key: 'planning', path: '/planning', icon: 'grid', permission: 'availability:read', labelFr: 'Planning des chambres', labelEn: 'Room planner', labelAr: 'مخطط الغرف', sortOrder: 25 },
   { key: 'guests', path: '/guests', icon: 'users', permission: 'guests:read', labelFr: 'Clients', labelEn: 'Guests', labelAr: 'النزلاء', sortOrder: 30 },
   { key: 'housekeeping', path: '/housekeeping', icon: 'sparkles', permission: 'rooms:status', labelFr: 'Ménage', labelEn: 'Housekeeping', labelAr: 'التدبير المنزلي', sortOrder: 40 },
-  { key: 'restaurant', path: '/restaurant', icon: 'utensils', permission: null, module: 'restaurant', labelFr: 'Restaurant', labelEn: 'Restaurant', labelAr: 'المطعم', sortOrder: 50 },
+  { key: 'restaurant', path: '/restaurant', icon: 'utensils', permission: 'billing:charge', module: 'restaurant', labelFr: 'Restaurant', labelEn: 'Restaurant', labelAr: 'المطعم', sortOrder: 50 },
   { key: 'invoices', path: '/invoices', icon: 'receipt', permission: 'billing:read', labelFr: 'Factures', labelEn: 'Invoices', labelAr: 'الفواتير', sortOrder: 55 },
   { key: 'reports', path: '/reports', icon: 'chart', permission: 'reports:read', labelFr: 'Rapports', labelEn: 'Reports', labelAr: 'التقارير', sortOrder: 60 },
   { key: 'admin', path: null, icon: 'settings', permission: null, labelFr: 'Administration', labelEn: 'Administration', labelAr: 'الإدارة', sortOrder: 90 },
@@ -23,6 +23,8 @@ export const DEFAULT_NAVIGATION: Partial<NavigationItem>[] = [
 ];
 
 export const DEMO_PASSWORD = 'ChangeMe!2026';
+/** Mot de passe des comptes créés : SEED_PASSWORD sur un serveur public (le mot de passe de démonstration est documenté). */
+export const seedPassword = () => process.env.SEED_PASSWORD || DEMO_PASSWORD;
 export const DEMO_USERS: { email: string; fullName: string; role: Role; locale?: 'fr' | 'en' | 'ar' }[] = [
   { email: 'admin@hotel.local', fullName: 'Direction', role: 'admin' },
   { email: 'reception@hotel.local', fullName: 'Réception', role: 'reception' },
@@ -40,7 +42,7 @@ export async function seed(ds: DataSource, opts: { users?: boolean; rooms?: bool
       await m.createQueryBuilder().insert().into(NavigationItem).values(item).orIgnore().execute();
     }
     if (opts.users) {
-      const hash = await bcrypt.hash(DEMO_PASSWORD, 10);
+      const hash = await bcrypt.hash(seedPassword(), 10);
       for (const u of DEMO_USERS) {
         await m.createQueryBuilder().insert().into(User).values({ ...u, locale: u.locale ?? 'fr', passwordHash: hash }).orIgnore().execute();
       }

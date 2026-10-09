@@ -13,6 +13,8 @@ import { dataSourceOptions } from './database/data-source';
 import { AuthModule } from './modules/auth/auth.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { ChangeEventsInterceptor } from './modules/events/emits';
+import { EventsModule } from './modules/events/events.module';
 import { GuestsModule } from './modules/guests/guests.module';
 import { HealthController } from './modules/health/health.controller';
 import { MeModule } from './modules/me/me.module';
@@ -27,6 +29,7 @@ import { UsersModule } from './modules/users/users.module';
     JwtModule.register({ global: true, secret: appConfig.jwt.secret }),
     ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: appConfig.rateLimit.defaultPerMinute }]),
     CommonModule,
+    EventsModule,
     AuthModule,
     MeModule,
     NavigationModule,
@@ -43,9 +46,11 @@ import { UsersModule } from './modules/users/users.module';
     { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: PermissionsGuard },
-    // Ordre des intercepteurs : mise en forme (externe) puis idempotence (interne).
+    // Ordre des intercepteurs : mise en forme (externe), idempotence, puis signalement des
+    // modifications (interne) : une réponse rejouée par l'idempotence n'est pas signalée deux fois.
     { provide: APP_INTERCEPTOR, useClass: ResponseShapingInterceptor },
     { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: ChangeEventsInterceptor },
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
   ],
 })

@@ -5,6 +5,7 @@ import { AuthUser, CurrentUser, RequirePermissions } from '../../common/auth.dec
 import { pickLang } from '../../common/i18n';
 import { Idempotent } from '../../common/idempotency';
 import { UuidParam } from '../../common/uuid.pipe';
+import { Emits } from '../events/emits';
 import { BillingSettingsDto, ChargeDto, CreditNoteDto, ExportQuery, IssueInvoiceDto, ListInvoicesQuery, PaymentDto } from './billing.dto';
 import { AccountingExportService } from './export.service';
 import { FolioService } from './folio.service';
@@ -30,13 +31,13 @@ export class BillingController {
     return this.folio.folio(id, pickLang(al));
   }
 
-  @Post('reservations/:id/folio/charges') @RequirePermissions('billing:charge')
+  @Post('reservations/:id/folio/charges') @RequirePermissions('billing:charge') @Emits('reservations', 'billing')
   @ApiOperation({ summary: 'Porter une prestation au compte du séjour' })
   addCharge(@Param('id', UuidParam) id: string, @Body() dto: ChargeDto, @CurrentUser() u: AuthUser, @Headers('accept-language') al?: string) {
     return this.folio.addCharge(id, dto, u, pickLang(al));
   }
 
-  @Delete('reservations/:id/folio/charges/:chargeId') @RequirePermissions('billing:write')
+  @Delete('reservations/:id/folio/charges/:chargeId') @RequirePermissions('billing:write') @Emits('reservations', 'billing')
   removeCharge(
     @Param('id', UuidParam) id: string,
     @Param('chargeId', UuidParam) chargeId: string,
@@ -46,19 +47,19 @@ export class BillingController {
     return this.folio.deleteCharge(id, chargeId, u, pickLang(al));
   }
 
-  @Post('rooms/:id/charges') @RequirePermissions('billing:charge')
+  @Post('rooms/:id/charges') @RequirePermissions('billing:charge') @Emits('rooms', 'billing')
   @ApiOperation({ summary: 'Facturation à la chambre : prestation portée au séjour en cours dans cette chambre' })
   chargeRoom(@Param('id', UuidParam) roomId: string, @Body() dto: ChargeDto, @CurrentUser() u: AuthUser) {
     return this.folio.chargeRoom(roomId, dto, u);
   }
 
-  @Post('reservations/:id/payments') @RequirePermissions('billing:write') @Idempotent() @IdemKey()
+  @Post('reservations/:id/payments') @RequirePermissions('billing:write') @Idempotent() @IdemKey() @Emits('reservations', 'billing')
   @ApiOperation({ summary: 'Enregistrer un acompte, un paiement ou un remboursement' })
   pay(@Param('id', UuidParam) id: string, @Body() dto: PaymentDto, @CurrentUser() u: AuthUser, @Headers('accept-language') al?: string) {
     return this.folio.addPayment(id, dto, u, pickLang(al));
   }
 
-  @Post('reservations/:id/invoice') @RequirePermissions('billing:write') @Idempotent() @IdemKey()
+  @Post('reservations/:id/invoice') @RequirePermissions('billing:write') @Idempotent() @IdemKey() @Emits('reservations', 'billing')
   @ApiOperation({ summary: 'Émettre la facture du séjour (numérotation continue, pièce inaltérable)' })
   issue(@Param('id', UuidParam) id: string, @Body() dto: IssueInvoiceDto, @CurrentUser() u: AuthUser, @Headers('accept-language') al?: string) {
     return this.invoices.issue(id, dto.lang ?? pickLang(al), u);
@@ -80,7 +81,7 @@ export class BillingController {
     return this.invoices.get(id);
   }
 
-  @Post('invoices/:id/credit-note') @RequirePermissions('billing:override') @Idempotent() @IdemKey()
+  @Post('invoices/:id/credit-note') @RequirePermissions('billing:override') @Idempotent() @IdemKey() @Emits('billing', 'reservations')
   @ApiOperation({ summary: 'Annuler une facture par un avoir total' })
   credit(@Param('id', UuidParam) id: string, @Body() dto: CreditNoteDto, @CurrentUser() u: AuthUser) {
     return this.invoices.creditNote(id, dto.reason, u);
@@ -100,7 +101,7 @@ export class BillingController {
     return this.settings.get();
   }
 
-  @Put('settings/billing') @RequirePermissions('settings:billing')
+  @Put('settings/billing') @RequirePermissions('settings:billing') @Emits('billing')
   @ApiHeader({ name: 'If-Match', required: true })
   putSettings(@Body() dto: BillingSettingsDto, @Headers('if-match') ifMatch: string | undefined, @CurrentUser() u: AuthUser) {
     return this.settings.update(dto as Partial<BillingSettings>, ifMatch, u);

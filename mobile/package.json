@@ -1,0 +1,19 @@
+{
+  "name": "hotel-pms-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Application Android (Capacitor) : ouvre l'application web de l'hôtel en plein écran",
+  "scripts": {
+    "sync": "cap sync android",
+    "build:debug": "cap sync android && cd android && gradlew assembleDebug",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2"
+  }
+}

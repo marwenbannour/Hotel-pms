@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger
 import { AuthUser, CurrentUser, RequirePermissions } from '../../common/auth.decorators';
 import { CursorQueryDto } from '../../common/pagination';
 import { UuidParam } from '../../common/uuid.pipe';
+import { Emits } from '../events/emits';
 import { CreateGuestDto, ListGuestsQuery, UpdateGuestDto } from './guests.dto';
 import { GuestsService } from './guests.service';
 
@@ -22,12 +23,12 @@ export class GuestsController {
     return this.guests.get(id);
   }
 
-  @Post() @RequirePermissions('guests:write')
+  @Post() @RequirePermissions('guests:write') @Emits('guests')
   create(@Body() dto: CreateGuestDto) {
     return this.guests.create(dto);
   }
 
-  @Patch(':id') @RequirePermissions('guests:write')
+  @Patch(':id') @RequirePermissions('guests:write') @Emits('guests')
   @ApiHeader({ name: 'If-Match', required: true })
   update(@Param('id', UuidParam) id: string, @Body() dto: UpdateGuestDto, @Headers('if-match') ifMatch?: string) {
     return this.guests.update(id, dto, ifMatch);
@@ -39,7 +40,7 @@ export class GuestsController {
     return this.guests.stays(id, q);
   }
 
-  @Post(':id/erase') @RequirePermissions('guests:erase') @HttpCode(200)
+  @Post(':id/erase') @RequirePermissions('guests:erase') @HttpCode(200) @Emits('guests', 'reservations')
   @ApiOperation({ summary: 'Effacement RGPD (anonymisation irréversible)' })
   erase(@Param('id', UuidParam) id: string, @CurrentUser() user: AuthUser) {
     return this.guests.erase(id, user);

@@ -1,6 +1,6 @@
 import { INestApplication, ValidationError, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
-import { randomUUID } from 'crypto';
+import { randomUUID, timingSafeEqual } from 'crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { ProblemException } from './common/problem';
 import { appConfig } from './config';
@@ -29,6 +29,21 @@ export function configureApp(app: INestApplication): OpenAPIObject {
     res.setHeader('X-Request-Id', req.requestId);
     res.setHeader('API-Version', appConfig.apiVersion);
     next();
+  });
+
+  // Hébergement public : l'API n'est appelée que par le serveur web (navigateurs et application mobile
+  // passent par lui), qui présente ce secret. Sans lui, personne ne peut joindre l'API directement
+  // ni falsifier X-Forwarded-For pour contourner la limitation de débit. /health reste ouvert (sondes).
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    const expected = process.env.PROXY_SECRET;
+    if (!expected || req.path === '/health') return next();
+    const given = Buffer.from(req.header('x-proxy-secret') ?? '');
+    const want = Buffer.from(expected);
+    if (given.length === want.length && timingSafeEqual(given, want)) return next();
+    res
+      .status(403)
+      .type('application/problem+json')
+      .json({ type: `${appConfig.publicBaseUrl}/errors/forbidden`, title: 'Forbidden', status: 403, code: 'FORBIDDEN', traceId: req.requestId });
   });
 
   app.useGlobalPipes(

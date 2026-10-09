@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger
 import { AuthUser, CurrentUser, RequirePermissions } from '../../common/auth.decorators';
 import { Idempotent } from '../../common/idempotency';
 import { UuidParam } from '../../common/uuid.pipe';
+import { Emits } from '../events/emits';
 import { AvailabilityService } from './availability.service';
 import {
   AssignRoomDto, AvailabilityQuery, CancelReservationDto, CheckInDto, CreateReservationDto, ListReservationsQuery, PlanningQuery, QuoteQuery, UpdateReservationDto,
@@ -55,13 +56,13 @@ export class ReservationsController {
     return this.reservations.history(id);
   }
 
-  @Post() @RequirePermissions('reservations:write') @Idempotent() @IdemKey()
+  @Post() @RequirePermissions('reservations:write') @Idempotent() @IdemKey() @Emits('reservations')
   @ApiOperation({ summary: 'Créer une réservation (contrôle de disponibilité atomique)' })
   create(@Body() dto: CreateReservationDto, @CurrentUser() user: AuthUser) {
     return this.reservations.create(dto, user);
   }
 
-  @Patch(':id') @RequirePermissions('reservations:write')
+  @Patch(':id') @RequirePermissions('reservations:write') @Emits('reservations')
   @ApiHeader({ name: 'If-Match', required: true })
   update(
     @Param('id', UuidParam) id: string,
@@ -72,7 +73,7 @@ export class ReservationsController {
     return this.reservations.update(id, dto, ifMatch, user);
   }
 
-  @Put(':id/room') @RequirePermissions('reservations:write')
+  @Put(':id/room') @RequirePermissions('reservations:write') @Emits('reservations')
   @ApiHeader({ name: 'If-Match', required: true })
   @ApiOperation({ summary: 'Pré-attribuer une chambre (ou retirer l’attribution avec roomId: null)' })
   assignRoom(
@@ -84,18 +85,18 @@ export class ReservationsController {
     return this.reservations.assignRoom(id, dto.roomId ?? null, ifMatch, user);
   }
 
-  @Post(':id/cancel') @RequirePermissions('reservations:write') @HttpCode(200)
+  @Post(':id/cancel') @RequirePermissions('reservations:write') @HttpCode(200) @Emits('reservations', 'billing')
   cancel(@Param('id', UuidParam) id: string, @Body() dto: CancelReservationDto, @CurrentUser() user: AuthUser) {
     return this.reservations.cancel(id, dto, user);
   }
 
-  @Post(':id/check-in') @RequirePermissions('frontdesk:operate') @HttpCode(200)
+  @Post(':id/check-in') @RequirePermissions('frontdesk:operate') @HttpCode(200) @Emits('reservations', 'rooms')
   @ApiOperation({ summary: 'Arrivée : attribue une chambre propre (automatique ou choisie)' })
   checkIn(@Param('id', UuidParam) id: string, @Body() dto: CheckInDto, @CurrentUser() user: AuthUser) {
     return this.reservations.checkIn(id, dto, user);
   }
 
-  @Post(':id/check-out') @RequirePermissions('frontdesk:operate') @HttpCode(200)
+  @Post(':id/check-out') @RequirePermissions('frontdesk:operate') @HttpCode(200) @Emits('reservations', 'rooms', 'billing')
   @ApiOperation({ summary: 'Départ : la chambre passe en nettoyage' })
   checkOut(@Param('id', UuidParam) id: string, @Body() dto: CheckOutDto, @CurrentUser() user: AuthUser) {
     return this.reservations.checkOut(id, user, dto.overrideBalanceReason);

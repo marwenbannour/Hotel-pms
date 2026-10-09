@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { addDays } from '@/lib/dates';
 import { PLANNING } from '@/lib/i18n-planning';
 import { useI18n } from '@/lib/lang-context';
+import { useRefreshInterval } from '@/lib/live';
 import type { PlanningData } from '@/lib/types';
 import { useHotelToday } from '../shell';
 
@@ -27,11 +28,12 @@ function Planning() {
   const from = params.get('from') ?? defaultFrom;
   const to = addDays(from, DAYS);
   const go = (d: string) => router.replace(d === defaultFrom ? pathname : `${pathname}?from=${d}`, { scroll: false });
+  const refetchInterval = useRefreshInterval(60_000);
 
   const q = useQuery({
     queryKey: ['planning', from, to],
     queryFn: async () => (await api<PlanningData>(`/planning?from=${from}&to=${to}`)).data,
-    refetchInterval: 60_000,
+    refetchInterval,
     placeholderData: (prev) => prev,
   });
 

@@ -9,10 +9,14 @@ import { Button } from '@/components/ui';
 import { api, ApiError } from '@/lib/api';
 import { HOUSEKEEPING } from '@/lib/i18n-housekeeping';
 import { useI18n } from '@/lib/lang-context';
+import { useRefreshInterval } from '@/lib/live';
 import type { Dashboard, Page, Room, RoomStatus, RoomType } from '@/lib/types';
 import { useMe } from '../shell';
 
-/** Même rythme que le tableau de bord : l'écran reste ouvert sur le téléphone de l'équipe. */
+/**
+ * Les changements arrivent en direct ; à défaut (flux coupé), même rythme que le tableau de bord :
+ * l'écran reste ouvert sur le téléphone de l'équipe.
+ */
 const REFRESH_MS = 30_000;
 const UNDO_MS = 8_000;
 
@@ -37,16 +41,17 @@ function Housekeeping() {
   const [error, setError] = useState<string | null>(null);
   const me = useMe();
   const canChange = !!me.data?.permissions.includes('rooms:status');
+  const refetchInterval = useRefreshInterval(REFRESH_MS);
 
   const dashboard = useQuery({
     queryKey: ['dashboard', lang],
     queryFn: async () => (await api<Dashboard>('/dashboard')).data,
-    refetchInterval: REFRESH_MS,
+    refetchInterval,
   });
   const rooms = useQuery({
     queryKey: ['rooms'],
     queryFn: async () => (await api<Page<Room>>('/rooms?limit=200')).data.data,
-    refetchInterval: REFRESH_MS,
+    refetchInterval,
   });
   const roomTypes = useQuery({
     queryKey: ['room-types'],
@@ -300,7 +305,7 @@ function Housekeeping() {
       </section>
 
       {last && (
-        <div role="status" className="fixed inset-x-4 bottom-4 z-20 mx-auto flex max-w-md items-center justify-between gap-4 rounded-lg bg-ink px-4 py-3 text-white shadow-lg">
+        <div role="status" className="fixed inset-x-4 bottom-[calc(1rem+var(--tabbar,0px))] z-20 mx-auto flex max-w-md items-center justify-between gap-4 rounded-lg bg-ink px-4 py-3 text-white shadow-lg">
           <span>{h.done[last.room.status](last.room.number)}</span>
           {canUndo && (
             <button

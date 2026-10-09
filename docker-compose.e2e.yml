@@ -24,7 +24,7 @@ services:
       # Secret propre à cette pile jetable, jamais utilisé ailleurs.
       JWT_SECRET: e2e-only-0f6b8c2d4e1a9b7c5d3e2f1a0b9c8d7e6f5a4b3c
       HOTEL_TZ: Europe/Paris
-      ENABLED_MODULES: core
+      ENABLED_MODULES: core,restaurant
       TRUST_PROXY: loopback, uniquelocal
       # Les scénarios se connectent bien plus souvent qu'un humain.
       AUTH_RATE_LIMIT_PER_MINUTE: "10000"

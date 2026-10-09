@@ -14,7 +14,11 @@ async function run() {
     console.log('Journée de démonstration créée.');
   }
   await ds.destroy();
-  console.log(`Données de démonstration créées. Comptes (mot de passe « ${DEMO_PASSWORD} ») :`);
+  console.log(
+    process.env.SEED_PASSWORD
+      ? 'Données créées. Comptes (mot de passe : valeur de SEED_PASSWORD) :'
+      : `Données de démonstration créées. Comptes (mot de passe « ${DEMO_PASSWORD} ») :`,
+  );
   for (const u of DEMO_USERS) console.log(`  ${u.role.padEnd(13)} ${u.email}`);
 }
 run().catch((e) => {

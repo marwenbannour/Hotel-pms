@@ -32,9 +32,13 @@ export function setMfaPending(cookies: ResponseCookies, mfaToken: string) {
   cookies.set(MFA_COOKIE, mfaToken, { ...base, maxAge: 300 });
 }
 
-/** En-têtes transmis à l'API : adresse du client (limitation de débit) et langue. */
+/** Secret partagé avec l'API hébergée (PROXY_SECRET des deux côtés) : seul ce serveur peut l'appeler. */
+const PROXY_SECRET = process.env.PROXY_SECRET;
+
+/** En-têtes transmis à l'API : secret du serveur web, adresse du client (limitation de débit) et langue. */
 export function forwardedHeaders(req: NextRequest): Record<string, string> {
   const h: Record<string, string> = {};
+  if (PROXY_SECRET) h['X-Proxy-Secret'] = PROXY_SECRET;
   const xff = req.headers.get('x-forwarded-for');
   if (xff) h['X-Forwarded-For'] = xff;
   // Langue de l'interface ; à défaut, l'API applique la langue du profil (pas celle du navigateur).

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icône à thème (Android 13+) : silhouette de l'étiquette, colorée par le système. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.875"
+        android:scaleY="0.875"
+        android:translateX="26"
+        android:translateY="26">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M14,22 L32,6 L50,22 L50,54 Q50,58 46,58 L18,58 Q14,58 14,54 Z M27,20 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0 Z M24,32 L40,32 A2,2 0 0,1 40,36 L24,36 A2,2 0 0,1 24,32 Z M24,41 L40,41 A2,2 0 0,1 40,45 L24,45 A2,2 0 0,1 24,41 Z M24,50 L32,50 A2,2 0 0,1 32,54 L24,54 A2,2 0 0,1 24,50 Z" />
+    </group>
+</vector>

@@ -1,0 +1,64 @@
+{
+  "expo": {
+    "name": "HOTELIA",
+    "slug": "hotel-pms",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#f6f7f9",
+    "ios": {
+      "bundleIdentifier": "com.hotelpms.expo",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        }
+      }
+    },
+    "android": {
+      "package": "com.hotelpms.expo",
+      "adaptiveIcon": {
+        "backgroundColor": "#0d182a",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "extra": {
+      "supportsRTL": true
+    },
+    "plugins": [
+      [
+        "expo-localization",
+        {
+          "supportsRTL": true
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 220,
+          "backgroundColor": "#0d182a"
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Pour lire le code QR d'une chambre.",
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-status-bar",
+      "expo-font"
+    ]
+  }
+}

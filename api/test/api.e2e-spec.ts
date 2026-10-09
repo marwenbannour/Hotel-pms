@@ -70,6 +70,19 @@ describe('Socle transverse', () => {
     expect(fields).toEqual(expect.arrayContaining(['adults', 'board']));
   });
 
+  it('PROXY_SECRET : sans le secret du serveur web, seule la sonde /health répond', async () => {
+    process.env.PROXY_SECRET = 'secret-du-serveur-web';
+    try {
+      await http().get('/health').expect(200);
+      const denied = await http().post('/v1/auth/login').send({ email: 'reception@hotel.local', password: 'ChangeMe!2026' }).expect(403);
+      expect(denied.body.code).toBe('FORBIDDEN');
+      await http().get('/v1/me').set(auth(reception)).set('X-Proxy-Secret', 'mauvais').expect(403);
+      await http().get('/v1/me').set(auth(reception)).set('X-Proxy-Secret', 'secret-du-serveur-web').expect(200);
+    } finally {
+      delete process.env.PROXY_SECRET;
+    }
+  });
+
   it('identifiant mal formé → 404, en-têtes RateLimit-*', async () => {
     const res = await http().get('/v1/reservations/not-a-uuid').set(auth(reception)).expect(404);
     expect(res.body.code).toBe('NOT_FOUND');
@@ -83,12 +96,34 @@ describe('Authentification', () => {
     const second = await http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }).expect(200);
     expect(second.body.refreshToken).not.toBe(first.refreshToken);
 
-    // Réutilisation de l'ancien jeton : refusée, et toute la session est révoquée.
+    // Réutilisation de l'ancien jeton après le délai de grâce : refusée, et toute la session est révoquée.
+    await ds.query(`UPDATE refresh_tokens SET rotated_at = rotated_at - interval '1 minute' WHERE id = $1`, [first.refreshToken.split('.')[0]]);
     await http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }).expect(401);
     await http().post('/v1/auth/refresh').send({ refreshToken: second.body.refreshToken }).expect(401);
 
     const [{ n }] = await ds.query(`SELECT count(*)::int AS n FROM audit_logs WHERE action = 'auth.refresh_reuse_detected'`);
     expect(n).toBeGreaterThan(0);
+  });
+
+  it('rafraîchissements simultanés : le jeton qui vient d’être remplacé reste accepté quelques secondes', async () => {
+    const first = await login(app, 'reception@hotel.local');
+    // Deux instances du serveur web présentent le même jeton en même temps.
+    const [a, b] = await Promise.all([
+      http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }),
+      http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }),
+    ]);
+    expect([a.status, b.status]).toEqual([200, 200]);
+    expect(a.body.refreshToken).not.toBe(b.body.refreshToken);
+    // Les deux nouvelles paires restent valables.
+    await http().post('/v1/auth/refresh').send({ refreshToken: a.body.refreshToken }).expect(200);
+    await http().post('/v1/auth/refresh').send({ refreshToken: b.body.refreshToken }).expect(200);
+  });
+
+  it('après déconnexion, un jeton remplacé à l’instant ne rouvre pas la session', async () => {
+    const first = await login(app, 'reception@hotel.local');
+    const second = await http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }).expect(200);
+    await http().post('/v1/auth/logout').send({ refreshToken: second.body.refreshToken }).expect(204);
+    await http().post('/v1/auth/refresh').send({ refreshToken: first.refreshToken }).expect(401);
   });
 
   it('la comptabilité doit activer la MFA avant d’accéder aux données', async () => {
@@ -132,9 +167,15 @@ describe('Menu dynamique', () => {
     const before = await http().get('/v1/me/navigation').set(auth(admin)).expect(200);
     expect(keys(before.body.items)).not.toContain('restaurant');
     process.env.ENABLED_MODULES = 'core,restaurant';
-    const after = await http().get('/v1/me/navigation').set(auth(admin)).expect(200);
-    expect(keys(after.body.items)).toContain('restaurant');
-    process.env.ENABLED_MODULES = 'core';
+    try {
+      const after = await http().get('/v1/me/navigation').set(auth(admin)).expect(200);
+      expect(keys(after.body.items)).toContain('restaurant');
+      // Facturation à la chambre : pas pour le ménage, qui ne peut pas porter de consommation.
+      const hk = await http().get('/v1/me/navigation').set(auth(housekeeping)).expect(200);
+      expect(keys(hk.body.items)).not.toContain('restaurant');
+    } finally {
+      process.env.ENABLED_MODULES = 'core';
+    }
   });
 
   it('l’administrateur modifie le menu sans redéploiement', async () => {

@@ -8,6 +8,7 @@ import { Button } from '@/components/ui';
 import { api } from '@/lib/api';
 import { addDays } from '@/lib/dates';
 import { useI18n, useRes } from '@/lib/lang-context';
+import { useRefreshInterval } from '@/lib/live';
 import type { Dashboard } from '@/lib/types';
 import { useHotelToday, useMe } from '@/app/(app)/shell';
 
@@ -22,11 +23,12 @@ export function MovementsDay({ kind }: { kind: 'arrivals' | 'departures' }) {
   const today = useHotelToday();
   const date = params.get('date') ?? today;
   const go = (d: string) => router.replace(d === today ? pathname : `${pathname}?date=${d}`, { scroll: false });
+  const refetchInterval = useRefreshInterval(30_000);
 
   const data = useQuery({
     queryKey: ['dashboard', lang, 'day', date],
     queryFn: async () => (await api<Dashboard>(`/dashboard?date=${date}`)).data,
-    refetchInterval: date === today ? 30_000 : false,
+    refetchInterval: date === today ? refetchInterval : false,
   });
   const rows = data.data?.movements?.[kind] ?? [];
 

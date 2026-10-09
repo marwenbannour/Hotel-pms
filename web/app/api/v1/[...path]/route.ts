@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { API_URL, AT_COOKIE, clearSession, forwardedHeaders, refreshOnce, RT_COOKIE, setSession, TokenPair } from '@/lib/server/session';
 
 export const dynamic = 'force-dynamic';
+// Hébergement serverless (Vercel) : le flux des modifications (/events) occupe la fonction jusqu'à
+// cette limite, puis le navigateur se reconnecte de lui-même (EventSource).
+export const maxDuration = 300;
 
 const REQUEST_HEADERS = ['content-type', 'if-match', 'idempotency-key'];
 const RESPONSE_HEADERS = ['content-type', 'content-disposition', 'etag', 'idempotent-replayed', 'retry-after', 'x-request-id', 'api-version'];
@@ -24,6 +27,8 @@ async function forward(req: NextRequest, ctx: { params: Promise<{ path: string[]
       body,
       cache: 'no-store',
       redirect: 'manual',
+      // Un flux (/events) reste ouvert : sa fermeture côté navigateur doit fermer l'appel à l'API.
+      signal: req.signal,
     });
 
   let res = await send(req.cookies.get(AT_COOKIE)?.value);
@@ -41,6 +46,12 @@ async function forward(req: NextRequest, ctx: { params: Promise<{ path: string[]
   for (const name of RESPONSE_HEADERS) {
     const v = res.headers.get(name);
     if (v) headers.set(name, v);
+  }
+  if (headers.get('content-type')?.startsWith('text/event-stream')) {
+    // no-transform : la compression du serveur Next mettrait les événements en mémoire tampon ;
+    // X-Accel-Buffering : même chose pour un proxy inverse nginx.
+    headers.set('cache-control', 'no-cache, no-transform');
+    headers.set('x-accel-buffering', 'no');
   }
   const out = new NextResponse(res.status === 204 ? null : res.body, { status: res.status, headers });
   if (refreshed) setSession(out.cookies, refreshed);

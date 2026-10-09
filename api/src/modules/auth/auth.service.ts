@@ -75,7 +75,11 @@ export class AuthService {
     return this.issue(user, randomUUID());
   }
 
-  /** Rotation : chaque jeton ne sert qu'une fois ; une réutilisation révoque toute la famille. */
+  /**
+   * Rotation : chaque jeton ne sert qu'une fois ; une réutilisation révoque toute la famille.
+   * Exception : un jeton remplacé depuis moins de refreshGraceSeconds, dans une session encore
+   * active, obtient une nouvelle paire (rafraîchissements simultanés sur plusieurs instances web).
+   */
   async refresh(raw: string): Promise<TokenPair> {
     const [id, secret] = raw.split('.');
     if (!id || !secret || !/^[0-9a-f-]{36}$/.test(id)) throw new ProblemException(401, 'INVALID_TOKEN');
@@ -87,6 +91,13 @@ export class AuthService {
       if (!token || token.tokenHash !== sha256(secret)) return { error: 'invalid' as const };
 
       if (token.revokedAt) {
+        const recent = token.rotatedAt && Date.now() - token.rotatedAt.getTime() <= appConfig.jwt.refreshGraceSeconds * 1000;
+        const sessionActive = recent && (await m.getRepository(RefreshToken).existsBy({ familyId: token.familyId, revokedAt: IsNull() }));
+        if (sessionActive && token.expiresAt > new Date()) {
+          const user = await m.getRepository(User).findOneBy({ id: token.userId, active: true });
+          if (!user) return { error: 'invalid' as const };
+          return { tokens: await this.issue(user, token.familyId, m.getRepository(RefreshToken)) };
+        }
         await m.update(RefreshToken, { familyId: token.familyId, revokedAt: IsNull() }, { revokedAt: new Date() });
         await this.audit.log(
           { actorId: token.userId, action: 'auth.refresh_reuse_detected', entityType: 'user', entityId: token.userId, data: { familyId: token.familyId } },
@@ -99,7 +110,8 @@ export class AuthService {
       const user = await m.getRepository(User).findOneBy({ id: token.userId, active: true });
       if (!user) return { error: 'invalid' as const };
 
-      await m.update(RefreshToken, { id: token.id }, { revokedAt: new Date() });
+      const now = new Date();
+      await m.update(RefreshToken, { id: token.id }, { revokedAt: now, rotatedAt: now });
       return { tokens: await this.issue(user, token.familyId, m.getRepository(RefreshToken)) };
     });
 

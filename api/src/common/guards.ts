@@ -12,6 +12,7 @@ export interface AccessTokenPayload {
   role: Role;
   typ: 'access';
   mfaEnrollmentRequired?: boolean;
+  exp?: number;
 }
 
 @Injectable()
@@ -39,6 +40,7 @@ export class JwtAuthGuard implements CanActivate {
       role: payload.role,
       permissions: permissionsOf(payload.role),
       mfaEnrollmentRequired: !!payload.mfaEnrollmentRequired,
+      tokenExpiresAt: payload.exp,
     };
     if (user.mfaEnrollmentRequired && !this.reflector.getAllAndOverride<boolean>(ALLOW_MFA_PENDING, targets)) {
       throw new ProblemException(403, 'MFA_REQUIRED', 'Activez la double authentification via POST /v1/me/mfa/setup.');

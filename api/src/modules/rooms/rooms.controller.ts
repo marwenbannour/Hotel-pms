@@ -2,6 +2,7 @@ import { Body, Controller, Get, Headers, Param, Patch, Post, Query } from '@nest
 import { ApiBearerAuth, ApiHeader, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthUser, CurrentUser, RequirePermissions } from '../../common/auth.decorators';
 import { UuidParam } from '../../common/uuid.pipe';
+import { Emits } from '../events/emits';
 import { CreateRoomDto, CreateRoomTypeDto, ListRoomsQuery, RoomStatusDto, UpdateRoomDto, UpdateRoomTypeDto } from './rooms.dto';
 import { RoomsService } from './rooms.service';
 
@@ -23,12 +24,12 @@ export class RoomTypesController {
     return this.rooms.getType(id);
   }
 
-  @Post() @RequirePermissions('rooms:write')
+  @Post() @RequirePermissions('rooms:write') @Emits('rooms')
   create(@Body() dto: CreateRoomTypeDto) {
     return this.rooms.createType(dto);
   }
 
-  @Patch(':id') @RequirePermissions('rooms:write') @IfMatch()
+  @Patch(':id') @RequirePermissions('rooms:write') @IfMatch() @Emits('rooms')
   update(@Param('id', UuidParam) id: string, @Body() dto: UpdateRoomTypeDto, @Headers('if-match') ifMatch?: string) {
     return this.rooms.updateType(id, dto, ifMatch);
   }
@@ -50,17 +51,17 @@ export class RoomsController {
     return this.rooms.get(id);
   }
 
-  @Post() @RequirePermissions('rooms:write')
+  @Post() @RequirePermissions('rooms:write') @Emits('rooms')
   create(@Body() dto: CreateRoomDto) {
     return this.rooms.create(dto);
   }
 
-  @Patch(':id') @RequirePermissions('rooms:write') @IfMatch()
+  @Patch(':id') @RequirePermissions('rooms:write') @IfMatch() @Emits('rooms')
   update(@Param('id', UuidParam) id: string, @Body() dto: UpdateRoomDto, @Headers('if-match') ifMatch?: string) {
     return this.rooms.update(id, dto, ifMatch);
   }
 
-  @Patch(':id/status') @RequirePermissions('rooms:status') @IfMatch()
+  @Patch(':id/status') @RequirePermissions('rooms:status') @IfMatch() @Emits('rooms')
   @ApiOperation({ summary: 'Changer l’état d’une chambre (propre, nettoyage, maintenance)' })
   setStatus(
     @Param('id', UuidParam) id: string,

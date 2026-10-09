@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 
 export const fieldClass =
   'mt-1 block w-full rounded-md border border-line bg-surface px-3 py-2 text-ink outline-none focus:border-brass disabled:opacity-60';
@@ -51,3 +51,20 @@ export function useDebounced<T>(value: T, ms = 300): T {
   }, [value, ms]);
   return v;
 }
+
+/**
+ * Vrai sur un écran de téléphone (sous le point de rupture `sm` de Tailwind). Sert à ne rendre
+ * qu'une seule présentation (cartes ou tableau), plutôt que les deux masquées en CSS.
+ */
+export function usePhone(): boolean {
+  return useSyncExternalStore(
+    (onChange) => {
+      const mq = window.matchMedia(PHONE_QUERY);
+      mq.addEventListener('change', onChange);
+      return () => mq.removeEventListener('change', onChange);
+    },
+    () => window.matchMedia(PHONE_QUERY).matches,
+    () => false,
+  );
+}
+const PHONE_QUERY = '(max-width: 639.98px)';

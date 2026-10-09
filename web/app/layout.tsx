@@ -1,6 +1,8 @@
-import '@fontsource/ibm-plex-sans/400.css';
-import '@fontsource/ibm-plex-sans/500.css';
-import '@fontsource/ibm-plex-sans/600.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/poppins/500.css';
+import '@fontsource/poppins/600.css';
 import '@fontsource/ibm-plex-sans-arabic/400.css';
 import '@fontsource/ibm-plex-sans-arabic/500.css';
 import '@fontsource/ibm-plex-sans-arabic/600.css';
@@ -12,10 +14,18 @@ import { Providers } from './providers';
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = (await cookies()).get(LANG_COOKIE)?.value;
-  return { title: DICTS[isLang(lang) ? lang : 'fr'].appName, robots: { index: false } };
+  const t = DICTS[isLang(lang) ? lang : 'fr'];
+  return {
+    title: t.appName,
+    robots: { index: false },
+    // Ajout à l'écran d'accueil sur iOS (le manifeste n'y suffit pas).
+    appleWebApp: { capable: true, title: t.appShortName, statusBarStyle: 'default' },
+    icons: { apple: '/icons/apple-touch-icon.png' },
+  };
 }
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#16324f' };
+/** viewportFit cover : l'application installée occupe tout l'écran, encoches comprises (marges safe-area). */
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#0d182a', viewportFit: 'cover' };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const raw = (await cookies()).get(LANG_COOKIE)?.value;

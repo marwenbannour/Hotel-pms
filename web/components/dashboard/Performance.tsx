@@ -2,6 +2,7 @@
 
 import { useI18n } from '@/lib/lang-context';
 import type { Dashboard } from '@/lib/types';
+import { CARD, CardTitle } from './card';
 
 /** Indicateurs de la section 3.8, affichés uniquement pour les profils ayant accès aux montants. */
 export function Performance({ data }: { data: Dashboard }) {
@@ -21,8 +22,8 @@ export function Performance({ data }: { data: Dashboard }) {
   ];
 
   return (
-    <section aria-labelledby="perf-title" className="rounded-lg bg-surface p-5 ring-1 ring-line sm:p-6">
-      <h2 id="perf-title" className="text-xl font-semibold tracking-tight">{t.performance}</h2>
+    <section aria-labelledby="perf-title" className={`${CARD} p-5`}>
+      <CardTitle id="perf-title">{t.performance}</CardTitle>
 
       <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <figure>
@@ -54,7 +55,7 @@ export function Performance({ data }: { data: Dashboard }) {
                   className="flex h-full flex-1 flex-col justify-end"
                 >
                   <div
-                    className={`min-h-[3px] rounded-t-[3px] ${d.forecast ? 'forecast' : 'bg-ink'} ${isToday ? 'ring-2 ring-brass ring-offset-1' : ''}`}
+                    className={`min-h-[3px] rounded-t-[3px] ${d.forecast ? 'forecast' : 'bg-ink'} ${isToday ? 'ring-2 ring-gold ring-offset-1' : ''}`}
                     style={{ height: `${(d.occupancyRate / max) * 100}%` }}
                   />
                 </div>
