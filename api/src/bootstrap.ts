@@ -19,8 +19,10 @@ export function configureApp(app: INestApplication): OpenAPIObject {
   app.getHttpAdapter().getInstance().set('etag', false);
   // L'adresse du client (limitation de débit, journaux) est lue dans X-Forwarded-For uniquement
   // si la requête vient d'un proxy de confiance, par défaut le serveur web sur la même machine.
+  // Valeurs acceptées : true/false, un nombre de proxys, ou une liste d'adresses ou de plages.
   const trustProxy = process.env.TRUST_PROXY ?? 'loopback';
-  app.getHttpAdapter().getInstance().set('trust proxy', /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy);
+  const trust = trustProxy === 'true' ? true : trustProxy === 'false' ? false : /^\d+$/.test(trustProxy) ? Number(trustProxy) : trustProxy;
+  app.getHttpAdapter().getInstance().set('trust proxy', trust);
   app.enableCors({ exposedHeaders: ['ETag', 'API-Version', 'X-Request-Id', 'Retry-After', 'Idempotent-Replayed', 'RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset'] });
 
   app.use((req: Request, res: Response, next: NextFunction) => {
