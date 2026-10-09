@@ -1,0 +1,35 @@
+# API sur Render (Blueprint) : image Docker de api/, base PostgreSQL externe (Neon), une seule instance
+# (le flux des modifications passe par un bus en mémoire). Le web est hébergé sur Vercel.
+services:
+  - type: web
+    name: hotelia-api
+    runtime: docker
+    rootDir: api
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: free
+    numInstances: 1
+    healthCheckPath: /health
+    envVars:
+      # Chaîne de connexion Neon (…?sslmode=require), saisie à la création du Blueprint.
+      - key: DATABASE_URL
+        sync: false
+      # Même valeur que PROXY_SECRET sur Vercel : seule l'application web peut appeler l'API.
+      - key: PROXY_SECRET
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # Seul le serveur web (qui présente PROXY_SECRET) joint l'API ; Vercel fixe X-Forwarded-For.
+      - key: TRUST_PROXY
+        value: "true"
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: HOTEL_NAME
+        value: Hotel
+      - key: HOTEL_TZ
+        value: Europe/Paris
+      - key: ENABLED_MODULES
+        value: core,restaurant
