@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+/** Serveur proposé au premier lancement (EXPO_PUBLIC_DEFAULT_SERVER dans .env, intégré au build) ; modifiable. */
+export const DEFAULT_SERVER = process.env.EXPO_PUBLIC_DEFAULT_SERVER ?? '';
+
 const KEY = 'serverUrl';
 const TIMEOUT_MS = 8000;
 

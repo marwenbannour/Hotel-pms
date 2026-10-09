@@ -32,7 +32,8 @@ export const setUnauthorizedHandler = (fn: () => void) => {
   onUnauthorized = fn;
 };
 
-const TIMEOUT_MS = 15_000;
+/** Large : un hébergement gratuit met l'API en veille et son réveil prend jusqu'à une minute. */
+const TIMEOUT_MS = 60_000;
 
 async function request(url: string, init: RequestInit): Promise<Response> {
   const ctrl = new AbortController();

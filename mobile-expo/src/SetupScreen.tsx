@@ -4,7 +4,7 @@ import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } f
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { T } from './i18n/launcher';
-import { checkServer, normalizeServer, saveServer } from './server';
+import { checkServer, DEFAULT_SERVER, normalizeServer, saveServer } from './server';
 import { radius, space, useTheme } from './theme';
 import { Button, ErrorNote, Input, Text } from './ui';
 
@@ -23,7 +23,7 @@ interface Props {
 export function SetupScreen({ initial, onDone, onCancel }: Props) {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
-  const [value, setValue] = useState(initial ?? '');
+  const [value, setValue] = useState(initial ?? DEFAULT_SERVER);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
