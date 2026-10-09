@@ -16,3 +16,6 @@ Thumbs.db
 # Tests de bout en bout
 web/e2e/artifacts/
 __pycache__/
+
+# Liens des projets Vercel (vercel link)
+.vercel
