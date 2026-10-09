@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { API_URL, forwardedHeaders, setMfaPending, setSession } from '@/lib/server/session';
+import { API_URL, apiFetch, forwardedHeaders, setMfaPending, setSession } from '@/lib/server/session';
 
 export async function POST(req: NextRequest) {
-  const res = await fetch(`${API_URL}/v1/auth/login`, {
+  const res = await apiFetch(`${API_URL}/v1/auth/login`, {
     method: 'POST',
     headers: { ...forwardedHeaders(req), 'Content-Type': 'application/json' },
     body: await req.text(),

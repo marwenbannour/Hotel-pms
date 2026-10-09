@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { API_URL, forwardedHeaders, MFA_COOKIE, setSession } from '@/lib/server/session';
+import { API_URL, apiFetch, forwardedHeaders, MFA_COOKIE, setSession } from '@/lib/server/session';
 
 export async function POST(req: NextRequest) {
   const { code } = await req.json().catch(() => ({ code: '' }));
-  const res = await fetch(`${API_URL}/v1/auth/mfa/verify`, {
+  const res = await apiFetch(`${API_URL}/v1/auth/mfa/verify`, {
     method: 'POST',
     headers: { ...forwardedHeaders(req), 'Content-Type': 'application/json' },
     body: JSON.stringify({ mfaToken: req.cookies.get(MFA_COOKIE)?.value ?? '', code }),

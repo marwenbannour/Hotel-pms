@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { API_URL, AT_COOKIE, clearSession, forwardedHeaders, refreshOnce, RT_COOKIE, setSession, TokenPair } from '@/lib/server/session';
+import { API_URL, apiFetch, AT_COOKIE, clearSession, forwardedHeaders, refreshOnce, RT_COOKIE, setSession, TokenPair } from '@/lib/server/session';
 
 export const dynamic = 'force-dynamic';
 // Hébergement serverless (Vercel) : le flux des modifications (/events) occupe la fonction jusqu'à
@@ -21,7 +21,7 @@ async function forward(req: NextRequest, ctx: { params: Promise<{ path: string[]
   }
 
   const send = (token?: string) =>
-    fetch(url, {
+    apiFetch(url, {
       method: req.method,
       headers: token ? { ...base, Authorization: `Bearer ${token}` } : base,
       body,

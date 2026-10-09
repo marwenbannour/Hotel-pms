@@ -32,6 +32,28 @@ export function setMfaPending(cookies: ResponseCookies, mfaToken: string) {
   cookies.set(MFA_COOKIE, mfaToken, { ...base, maxAge: 300 });
 }
 
+/** Réveil de l'API : un hébergement gratuit la met en veille et répond 502/503 le temps de redémarrer. */
+const WAKE_STATUSES = new Set([502, 503, 504]);
+const WAKE_DEADLINE_MS = 60_000;
+
+/**
+ * Appel à l'API qui patiente pendant son réveil : nouvel essai (2 s, 3 s, 5 s…) tant qu'elle répond
+ * 502/503/504 ou coupe la connexion, dans la limite d'une minute. Le corps doit être rejouable
+ * (chaîne ou ArrayBuffer), ce qui est le cas de tous les appels du serveur web.
+ */
+export async function apiFetch(url: string, init: RequestInit): Promise<Response> {
+  const deadline = Date.now() + WAKE_DEADLINE_MS;
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const res = await fetch(url, init);
+      if (!WAKE_STATUSES.has(res.status) || Date.now() >= deadline) return res;
+    } catch (e) {
+      if (init.signal?.aborted || Date.now() >= deadline) throw e;
+    }
+    await new Promise((r) => setTimeout(r, [2000, 3000, 5000][Math.min(attempt, 2)]));
+  }
+}
+
 /** Secret partagé avec l'API hébergée (PROXY_SECRET des deux côtés) : seul ce serveur peut l'appeler. */
 const PROXY_SECRET = process.env.PROXY_SECRET;
 
@@ -60,7 +82,7 @@ const inflight = new Map<string, Promise<TokenPair | null>>();
 export function refreshOnce(refreshToken: string, headers: Record<string, string>): Promise<TokenPair | null> {
   const existing = inflight.get(refreshToken);
   if (existing) return existing;
-  const p = fetch(`${API_URL}/v1/auth/refresh`, {
+  const p = apiFetch(`${API_URL}/v1/auth/refresh`, {
     method: 'POST',
     headers: { ...headers, 'Content-Type': 'application/json' },
     body: JSON.stringify({ refreshToken }),
