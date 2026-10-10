@@ -1,8 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getLocales } from 'expo-localization';
 import * as Updates from 'expo-updates';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { DevSettings, I18nManager } from 'react-native';
+import { deviceLanguage } from './device';
 import { BILLING } from './shared/i18n-billing';
 import { HOUSEKEEPING } from './shared/i18n-housekeeping';
 import { RES } from './shared/i18n-res';
@@ -13,7 +13,7 @@ export type { Lang };
 
 const KEY = 'lang';
 const deviceLang = (): Lang => {
-  const code = getLocales()[0]?.languageCode;
+  const code = deviceLanguage();
   return isLang(code) ? code : 'fr';
 };
 
@@ -49,7 +49,8 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
         const initial = isLang(saved) ? saved : deviceLang();
         setLangState(initial);
         // Sens resté désaccordé (réglage perdu) : corrigé pour le prochain démarrage, sans relance ici.
-        const rtl = initial === 'ar';        if (I18nManager.isRTL !== rtl) {
+        const rtl = initial === 'ar';
+        if (I18nManager.isRTL !== rtl) {
           I18nManager.allowRTL(rtl);
           I18nManager.forceRTL(rtl);
         }

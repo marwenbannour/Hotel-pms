@@ -32,7 +32,7 @@ npx expo start            # QR code à scanner avec Expo Go (SDK 58), ou « Ente
 
 - `design/tokens.json` : copie des tokens de la charte HOTELIA (artefact « HOTELIA »). `npm run theme` génère `src/theme/tokens.ts` (couleurs par mode, échelles, ombres iOS/Android, styles de texte et leur variante arabe, durées).
 - `npm run i18n` copie les dictionnaires et les types de l'application web (`web/lib`) dans `src/i18n/shared` et `src/api/types.ts` : une seule source pour les textes. Les textes propres au mobile sont dans `src/i18n/mobile.ts`.
-- La langue suit le profil ; l'arabe passe la mise en page de droite à gauche (redémarrage de l'application). `supportsRTL` est déclaré dans `app.json` (`extra` et plugin `expo-localization`).
+- La langue suit le profil ; l'arabe passe la mise en page de droite à gauche (redémarrage de l'application). `supportsRTL` est déclaré dans `app.json` (`extra`). La langue du téléphone est lue par React Native (`src/i18n/device.ts`) : pas d'`expo-localization`, dont le module natif remettait le sens de lecture à zéro à chaque démarrage.
 - Expo Go ne garde pas ce choix d'un lancement à l'autre : il suit la langue du téléphone. Pour tester l'arabe de droite à gauche dans Expo Go, mettre Expo Go en arabe (Android : Paramètres > Applications > Expo Go > Langue, ou `adb shell cmd locale set-app-locales host.exp.exponent --locales ar`). Dans l'application construite (APK), la bascule fonctionne seule.
 
 ## Architecture

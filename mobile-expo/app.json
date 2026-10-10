@@ -29,12 +29,6 @@
     },
     "plugins": [
       [
-        "expo-localization",
-        {
-          "supportsRTL": true
-        }
-      ],
-      [
         "expo-build-properties",
         {
           "android": {

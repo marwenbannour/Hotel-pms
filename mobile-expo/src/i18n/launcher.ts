@@ -1,4 +1,4 @@
-import { getLocales } from 'expo-localization';
+import { deviceLanguage } from './device';
 
 /** Textes de l'application elle-même ; ensuite, l'application web suit la langue du profil. */
 const fr = {
@@ -54,7 +54,7 @@ const ar: Texts = {
   changeServer: 'تغيير الخادم',
 };
 
-const code = getLocales()[0]?.languageCode ?? 'fr';
+const code = deviceLanguage() ?? 'fr';
 export const LANG = code === 'ar' ? 'ar' : code === 'en' ? 'en' : 'fr';
 
 export const T: Texts = { fr, en, ar }[LANG];
